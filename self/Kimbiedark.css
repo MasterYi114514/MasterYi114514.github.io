@@ -1,0 +1,116 @@
+/*
+    Name:     GitHub Dark Custom Bright
+    Author:   Modified Based on GitHub Dark
+    License:  MIT
+*/
+
+/* 自定义变量配置区
+  ------------------------------------- 
+  --hl-color                  代码框字体颜色 【必须】 (复制下方主hljs color值)
+  --hl-bg                     代码框背景色 【必须】 (复制下方主hljs background值)
+  --hltools-bg                代码框顶部工具栏背景色 【可选】
+  --hltools-color             代码框顶部工具栏字体颜色 【可选】
+  --hlnumber-bg               代码框行数背景色 【可选】
+  --hlnumber-color            代码框行数字体颜色 【可选】
+  --hlscrollbar-bg            代码框滚动条颜色 【可选】
+  --hlexpand-bg               代码框底部展开背景色 【可选】
+*/
+
+:root {
+    --hl-color: #c9d1d9;
+    --hl-bg: #161b22;
+    --hltools-bg: #0d1117;
+    --hltools-color: #c9d1d9;
+    --hlnumber-bg: #161b22;
+    --hlnumber-color: #6e7681;
+    --hlscrollbar-bg: #30363d;
+    --hlexpand-bg: #21262d;
+}
+
+/* include 等预处理指令 */
+#article-container .hljs-meta {
+    color: #ca022d !important;
+}
+
+/* include内的头文件路径字符串 橙黄色 */
+#article-container .hljs-meta-string {
+    color: #ffcc00 !important;
+}
+
+/* 注释、引用 */
+.hljs-comment,
+.hljs-quote {
+    color: #00ffb3;
+    font-style: italic;
+}
+
+/* 变量、标签、元信息、删除行 */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-meta,
+.hljs-deletion {
+    color: #00d9ff;
+}
+
+/* 数字、内置类型、字面量、参数 */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params {
+    color: #fff200;
+}
+
+/* 标题、属性、类名 */
+.hljs-title,
+.hljs-section,
+.hljs-attribute {
+    color: #d2a8ff;
+}
+
+/* 字符串、符号、新增行、链接 */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition,
+.hljs-link {
+    color: #a5d6ff;
+}
+
+/* 关键字、选择器、函数名 */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-function {
+    color: #00ff84;
+}
+
+/* 运算符、标点 */
+.hljs-operator,
+.hljs-punctuation {
+    color: #c9d1d9;
+}
+
+/* 加粗、斜体 */
+.hljs-emphasis {
+    font-style: italic;
+}
+
+.hljs-strong {
+    font-weight: bold;
+}
+
+/* 主代码块容器（适配文章页面结构）
+/* ------------------------------------- */
+#article-container figure.highlight .hljs {
+    display: block;
+    overflow-x: auto;
+    background: #161b22;
+    color: #c9d1d9;
+    padding: 0.5em;
+}
