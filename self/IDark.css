@@ -1,0 +1,115 @@
+/* ============================================================
+ * IDark — PrismJS 代码高亮配色
+ * 修改此文件后运行 hexo generate 即可生效
+ * 颜色参考：_config.butterfly.yml → code_blocks.IDark
+ * ============================================================ */
+
+/* ---------- 代码块背景 / UI ---------- */
+/* 覆盖 Butterfly 默认暗色模式的 :root 变量 */
+:root,
+[data-theme='dark'] {
+  --hl-color:       #e6edf3;     /* 默认文字颜色 */
+  --hl-bg:          #0d1117;     /* 代码块背景 */
+  --hltools-bg:     #161b22;     /* 工具栏背景 */
+  --hltools-color:  #8b949e;     /* 工具栏文字 */
+  --hlnumber-bg:    #0d1117;     /* 行号列背景 */
+  --hlnumber-color: #8b949e;     /* 行号文字 */
+  --hlscrollbar-bg: #30363d;     /* 滚动条 */
+}
+
+/* 代码块整体背景统一 */
+pre[class*='language-'],
+pre[class*='language-'] code {
+  background: #0d1117 !important;
+}
+
+/* ---------- Token 配色 ---------- */
+
+/* 注释 — 深绿色，无斜体 */
+pre[class*='language-'] .token.comment,
+pre[class*='language-'] .token.prolog,
+pre[class*='language-'] .token.doctype,
+pre[class*='language-'] .token.cdata {
+  color: #00f656;
+  font-style: normal;
+}
+
+/* 关键字 return class struct if else for while — 红色 */
+pre[class*='language-'] .token.keyword {
+  color: #ff7b72;
+}
+
+/* #include #define 等预处理指令 — 紫红色 */
+pre[class*='language-'] .token.preprocessor,
+pre[class*='language-'] .token.macro,
+pre[class*='language-'] [class*="directive"] {
+  color: #b00ac6;
+}
+
+/* 头文件名 <iostream> 、字符串 "hello"、字符 'a' — 橙黄 */
+pre[class*='language-'] .token.string,
+pre[class*='language-'] .token.char,
+pre[class*='language-'] .token.attr-value {
+  color: #FFA726;
+}
+
+/* 数字 42 3.14 — 绿色 */
+pre[class*='language-'] .token.number {
+  color: #58d27b;
+}
+
+/* 函数名、类名 — 黄色 */
+pre[class*='language-'] .token.function,
+pre[class*='language-'] .token.class-name {
+  color: #ffd700;
+}
+
+/* 内建对象 cout cin — 紫色 */
+pre[class*='language-'] .token.builtin {
+  color: #d2a8ff;
+}
+
+/* 变量标识符、属性名 — 亮蓝色 */
+pre[class*='language-'] .token.variable,
+pre[class*='language-'] .token.attr-name {
+  color: #1dc6ff;
+}
+
+/* 常量、布尔值 true false nullptr — 蓝色 */
+pre[class*='language-'] .token.constant,
+pre[class*='language-'] .token.boolean {
+  color: #79c0ff;
+}
+
+/* 运算符 + - = == — 红色 */
+pre[class*='language-'] .token.operator {
+  color: #ff7b72;
+}
+
+/* 标点 ; { } ( ) — 默认前景色 */
+pre[class*='language-'] .token.punctuation {
+  color: #e6edf3;
+}
+
+/* HTML/XML 标签 — 蓝色 */
+pre[class*='language-'] .token.tag {
+  color: #79c0ff;
+}
+
+/* 选择器、正则 — 黄色 */
+pre[class*='language-'] .token.selector,
+pre[class*='language-'] .token.regex {
+  color: #ffd700;
+}
+
+/* diff 删除/新增 */
+pre[class*='language-'] .token.deleted { color: #f85149; }
+pre[class*='language-'] .token.inserted { color: #3fb950; }
+
+pre[class*='language-'] .token.important,
+pre[class*='language-'] .token.bold {
+  font-weight: bold;
+}
+pre[class*='language-'] .token.italic {
+  font-style: italic;
+}
