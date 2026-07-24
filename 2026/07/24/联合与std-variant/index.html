@@ -1,0 +1,779 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>联合与std::variant | CS学习从入门到入土</title><meta name="author" content="颐大人"><meta name="copyright" content="颐大人"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="需要预先了解：  [[内存基础]] [[变量与常量]]   联合（Union） 联合（union） 是一种特殊的数据类型，它允许在同一块内存空间中存储不同类型的数据，但同一时刻只能有一个成员是有效的。定义语法与 struct 类似，只是把关键字换为 union： union Data &#123;     int    i;     double d;     char   c; &#125;;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="联合与std::variant">
+<meta property="og:url" content="https://masteryi114514.github.io/2026/07/24/%E8%81%94%E5%90%88%E4%B8%8Estd-variant/index.html">
+<meta property="og:site_name" content="CS学习从入门到入土">
+<meta property="og:description" content="需要预先了解：  [[内存基础]] [[变量与常量]]   联合（Union） 联合（union） 是一种特殊的数据类型，它允许在同一块内存空间中存储不同类型的数据，但同一时刻只能有一个成员是有效的。定义语法与 struct 类似，只是把关键字换为 union： union Data &#123;     int    i;     double d;     char   c; &#125;;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://masteryi114514.github.io/img/cpp.jpg">
+<meta property="article:published_time" content="2026-07-24T15:34:59.000Z">
+<meta property="article:modified_time" content="2026-07-24T16:01:18.200Z">
+<meta property="article:author" content="颐大人">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="C++进阶">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://masteryi114514.github.io/img/cpp.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "联合与std::variant",
+  "url": "https://masteryi114514.github.io/2026/07/24/%E8%81%94%E5%90%88%E4%B8%8Estd-variant/",
+  "image": "https://masteryi114514.github.io/img/cpp.jpg",
+  "datePublished": "2026-07-24T15:34:59.000Z",
+  "dateModified": "2026-07-24T16:01:18.200Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "颐大人",
+      "url": "https://MasterYi114514.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.jpg"><link rel="canonical" href="https://masteryi114514.github.io/2026/07/24/%E8%81%94%E5%90%88%E4%B8%8Estd-variant/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.6.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '7F7F7F')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '联合与std::variant',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><link rel="stylesheet" href="/self/IDark.css"><meta name="generator" content="Hexo 8.1.2"></head><body><div class="bg-animation" id="web_bg" style="background-color: #27282A;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-folder"></i><span> 所有分类</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/Cpp/"><i class="fa-fw fas fa-code"></i><span> C++教程</span></a></li><li><a class="site-page child" href="/categories/CMake/"><i class="fa-fw fas fa-cogs"></i><span> CMake教程</span></a></li><li><a class="site-page child" href="/categories/OpenGL/"><i class="fa-fw fas fa-cube"></i><span> OpenGL学习记录</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/cpp.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"></a><a class="nav-page-title" href="/"><span class="site-name">联合与std::variant</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-folder"></i><span> 所有分类</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/Cpp/"><i class="fa-fw fas fa-code"></i><span> C++教程</span></a></li><li><a class="site-page child" href="/categories/CMake/"><i class="fa-fw fas fa-cogs"></i><span> CMake教程</span></a></li><li><a class="site-page child" href="/categories/OpenGL/"><i class="fa-fw fas fa-cube"></i><span> OpenGL学习记录</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">联合与std::variant</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-07-24T15:34:59.000Z" title="发表于 2026-07-24 23:34:59">2026-07-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-07-24T16:01:18.200Z" title="更新于 2026-07-25 00:01:18">2026-07-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Cpp/">Cpp</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>需要预先了解：</p>
+<ul>
+<li><a href="/2026/07/21/内存基础/">内存基础</a></li>
+<li><a href="/2026/07/22/变量与常量/">变量与常量</a></li>
+</ul>
+<hr>
+<h1>联合（Union）</h1>
+<p><strong>联合（union）</strong> 是一种特殊的数据类型，它允许在<strong>同一块内存空间</strong>中存储不同类型的数据，但<strong>同一时刻只能有一个成员是有效的</strong>。定义语法与 <code>struct</code> 类似，只是把关键字换为 <code>union</code>：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">union</span> Data
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span>    i<span class="token punctuation">;</span>
+    <span class="token keyword">double</span> d<span class="token punctuation">;</span>
+    <span class="token keyword">char</span>   c<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>使用时像结构体一样访问成员，但所有成员<strong>共享同一块内存</strong>：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    Data u<span class="token punctuation">;</span>
+    u<span class="token punctuation">.</span>i <span class="token operator">=</span> <span class="token number">42</span><span class="token punctuation">;</span>                       <span class="token comment">// 写入 int</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> u<span class="token punctuation">.</span>i <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>  <span class="token comment">// 输出: 42</span>
+
+    u<span class="token punctuation">.</span>d <span class="token operator">=</span> <span class="token number">3.14</span><span class="token punctuation">;</span>                     <span class="token comment">// 写入 double——覆盖了原来的 int！</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> u<span class="token punctuation">.</span>d <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>  <span class="token comment">// 输出: 3.14</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> u<span class="token punctuation">.</span>i <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>  <span class="token comment">// 输出: 垃圾值（被 double 的字节覆盖了）</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>当 <code>u.d = 3.14</code> 执行后，之前写入的 <code>u.i</code> 就被覆盖了。再读 <code>u.i</code> 拿到的是 <code>3.14</code> 的 IEEE 754 二进制表示被重新解释为 <code>int</code> 的垃圾值。</p>
+<hr>
+<h2 id="内存布局">内存布局</h2>
+<p>union 的内存布局只有一条核心规则：<strong>所有成员从同一地址（offset 0）开始</strong>，union 的大小等于其最大成员的大小（再按对齐要求补齐）。</p>
+<pre class="line-numbers language-none"><code class="language-none">                        union Data (大小为 8 字节，即 sizeof(double))
+         ┌───────────────────────────────────────────────────────────────────────┐
+         │                                                                       │
+offset:  0        1        2        3        4        5        6        7        │
+         ├────────┬────────┬────────┬────────┬────────┬────────┬────────┬────────┤
+         │◄─ int i (4字节，从 offset 0 开始) ─►│                                   │
+         ├───────────────────────────────────────────────────────────────────────┤
+         │◄────────────────── double d (8 字节，从 offset 0 开始) ────────────────►│
+         ├────────┬────────┬────────┬────────┬────────┬────────┬────────┬────────┤
+         │ char c │                                                              │
+         └────────┴────────┴────────┴────────┴────────┴────────┴────────┴────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>验证代码：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+
+<span class="token keyword">union</span> Data
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span>    i<span class="token punctuation">;</span>
+    <span class="token keyword">double</span> d<span class="token punctuation">;</span>
+    <span class="token keyword">char</span>   c<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    Data u<span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"sizeof(Data)   = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>Data<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>    <span class="token comment">// 8（通常）</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"sizeof(u.i)    = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>u<span class="token punctuation">.</span>i<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>     <span class="token comment">// 4</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"sizeof(u.d)    = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>u<span class="token punctuation">.</span>d<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>     <span class="token comment">// 8</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"sizeof(u.c)    = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>u<span class="token punctuation">.</span>c<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>     <span class="token comment">// 1</span>
+
+    <span class="token comment">// 所有成员的地址相同</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"&amp;u    = "</span> <span class="token operator">&lt;&lt;</span> <span class="token operator">&amp;</span>u <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"&amp;u.i  = "</span> <span class="token operator">&lt;&lt;</span> <span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>u<span class="token punctuation">.</span>i <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"&amp;u.d  = "</span> <span class="token operator">&lt;&lt;</span> <span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>u<span class="token punctuation">.</span>d <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"&amp;u.c  = "</span> <span class="token operator">&lt;&lt;</span> <span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>u<span class="token punctuation">.</span>c <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>编译并运行后，四个地址完全相同——它们指向同一块内存的同一个起点。</p>
+<blockquote>
+<p><strong>理解要点</strong>：可以把 union 想象成一个&quot;重叠区&quot;——int、double、char 都堆在同一个起始位置，写谁就覆盖谁。这和 struct（成员依次往后排、互不重叠）完全不同。</p>
+</blockquote>
+<hr>
+<h2 id="union-的对齐规则">union 的对齐规则</h2>
+<p>union 的<strong>对齐要求</strong>等于所有成员中对齐要求最严格的那一个的值，大小也需要是该对齐值的整数倍。</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+
+<span class="token keyword">union</span> Example
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">char</span>   c<span class="token punctuation">;</span>      <span class="token comment">// 对齐 1，大小 1</span>
+    <span class="token keyword">int</span>    i<span class="token punctuation">;</span>      <span class="token comment">// 对齐 4，大小 4</span>
+    <span class="token keyword">double</span> d<span class="token punctuation">;</span>      <span class="token comment">// 对齐 8，大小 8</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"sizeof(Example) = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>Example<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>   <span class="token comment">// 8</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"alignof(Example) = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">alignof</span><span class="token punctuation">(</span>Example<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span> <span class="token comment">// 8</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>double</code> 对齐要求为 8，所以 <code>alignof(Example) = 8</code>；<code>sizeof(Example)</code> 取最大成员大小 8，正好是对齐值 8 的整数倍，所以不需要额外填充。</p>
+<p>再看一个填充的例子：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+
+<span class="token keyword">union</span> Padding
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">char</span>   arr<span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">;</span>   <span class="token comment">// 大小 5，对齐 1</span>
+    <span class="token keyword">int</span>    i<span class="token punctuation">;</span>        <span class="token comment">// 大小 4，对齐 4</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"sizeof(Padding) = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>Padding<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>   <span class="token comment">// 8</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"alignof(Padding) = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">alignof</span><span class="token punctuation">(</span>Padding<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span> <span class="token comment">// 4</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>最大成员 <code>arr</code> 占 5 字节，但 <code>int</code> 要求对齐 4，所以 union 大小必须对齐到 4 的边界——结果 <code>5 → 8</code>（补齐 3 个字节的尾部填充）。</p>
+<hr>
+<h2 id="匿名-union">匿名 union</h2>
+<p><strong>匿名 union</strong> 不声明类型名，其成员直接作为外层作用域的变量来访问：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+
+<span class="token keyword">struct</span> <span class="token class-name">Message</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span> type<span class="token punctuation">;</span>
+    <span class="token comment">// 匿名 union——成员直接视为 Message 的成员</span>
+    <span class="token keyword">union</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">int</span>   int_val<span class="token punctuation">;</span>
+        <span class="token keyword">float</span> float_val<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    Message msg<span class="token punctuation">;</span>
+    msg<span class="token punctuation">.</span>type   <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    msg<span class="token punctuation">.</span>int_val <span class="token operator">=</span> <span class="token number">42</span><span class="token punctuation">;</span>            <span class="token comment">// 直接访问，不需要 msg.u.int_val</span>
+
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> msg<span class="token punctuation">.</span>int_val <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>   <span class="token comment">// 输出: 42</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>匿名 union 常用于 struct/class 内部，减少一层命名嵌套。</p>
+<hr>
+<h2 id="union-的应用场景">union 的应用场景</h2>
+<h3 id="1-带标签的联合（Tagged-Union）">1. 带标签的联合（Tagged Union）</h3>
+<p>由于 union 不记录当前活跃成员是谁，通常搭配一个 <strong>标签（tag，通常用 <code>enum</code>）</strong> 来跟踪：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;cstring></span></span>
+
+<span class="token keyword">enum</span> <span class="token keyword">class</span> <span class="token class-name">DataType</span> <span class="token punctuation">&#123;</span> INT<span class="token punctuation">,</span> FLOAT<span class="token punctuation">,</span> STRING <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">union</span> DataValue
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span>   i<span class="token punctuation">;</span>
+    <span class="token keyword">float</span> f<span class="token punctuation">;</span>
+    <span class="token keyword">char</span>  s<span class="token punctuation">[</span><span class="token number">32</span><span class="token punctuation">]</span><span class="token punctuation">;</span>         <span class="token comment">// 固定大小的字符数组</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">struct</span> <span class="token class-name">TaggedData</span>
+<span class="token punctuation">&#123;</span>
+    DataType  type<span class="token punctuation">;</span>
+    DataValue value<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">print</span><span class="token punctuation">(</span><span class="token keyword">const</span> TaggedData<span class="token operator">&amp;</span> data<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span>data<span class="token punctuation">.</span>type<span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+    <span class="token keyword">case</span> DataType<span class="token double-colon punctuation">::</span>INT<span class="token operator">:</span>
+        std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"int: "</span> <span class="token operator">&lt;&lt;</span> data<span class="token punctuation">.</span>value<span class="token punctuation">.</span>i <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token keyword">case</span> DataType<span class="token double-colon punctuation">::</span>FLOAT<span class="token operator">:</span>
+        std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"float: "</span> <span class="token operator">&lt;&lt;</span> data<span class="token punctuation">.</span>value<span class="token punctuation">.</span>f <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token keyword">case</span> DataType<span class="token double-colon punctuation">::</span>STRING<span class="token operator">:</span>
+        std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"string: "</span> <span class="token operator">&lt;&lt;</span> data<span class="token punctuation">.</span>value<span class="token punctuation">.</span>s <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    TaggedData d1<span class="token punctuation">;</span>
+    d1<span class="token punctuation">.</span>type   <span class="token operator">=</span> DataType<span class="token double-colon punctuation">::</span>INT<span class="token punctuation">;</span>
+    d1<span class="token punctuation">.</span>value<span class="token punctuation">.</span>i <span class="token operator">=</span> <span class="token number">100</span><span class="token punctuation">;</span>
+    <span class="token function">print</span><span class="token punctuation">(</span>d1<span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token comment">// 输出: int: 100</span>
+
+    TaggedData d2<span class="token punctuation">;</span>
+    d2<span class="token punctuation">.</span>type <span class="token operator">=</span> DataType<span class="token double-colon punctuation">::</span>STRING<span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span><span class="token function">strcpy</span><span class="token punctuation">(</span>d2<span class="token punctuation">.</span>value<span class="token punctuation">.</span>s<span class="token punctuation">,</span> <span class="token string">"Hello"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">print</span><span class="token punctuation">(</span>d2<span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token comment">// 输出: string: Hello</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这是 C 语言中实现&quot;多类型变量&quot;的经典模式，也是 <code>std::variant</code> 的设计前身。</p>
+<h3 id="2-类型双关（Type-Punning）">2. 类型双关（Type Punning）</h3>
+<p>利用 union 用不同的类型去解读同一块内存，可以在不借助指针强转的情况下实现类型双关：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;cstdint></span></span>
+
+<span class="token keyword">union</span> FloatBits
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">float</span>    f<span class="token punctuation">;</span>
+    <span class="token keyword">uint32_t</span> bits<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    FloatBits fb<span class="token punctuation">;</span>
+    fb<span class="token punctuation">.</span>f <span class="token operator">=</span> <span class="token number">3.14159f</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 用整数视角逐个检查 float 的 IEEE 754 二进制表示</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>hex <span class="token operator">&lt;&lt;</span> <span class="token string">"0x"</span> <span class="token operator">&lt;&lt;</span> fb<span class="token punctuation">.</span>bits <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+    <span class="token comment">// 输出: 0x40490FD0</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p><strong>注意</strong>：在 C++ 中，读取 union 中非当前活跃成员的行为是<strong>未定义行为（Undefined Behavior，UB）</strong>——尽管在 C 语言中这是合法的，而且几乎所有 C++ 编译器也&quot;实际允许&quot;这样做。如果你需要可靠地重新解释字节，应使用 <code>std::memcpy</code> 或 C++20 的 <code>std::bit_cast</code>。</p>
+</blockquote>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">// C++20：安全的类型双关</span>
+<span class="token keyword">float</span> f <span class="token operator">=</span> <span class="token number">3.14159f</span><span class="token punctuation">;</span>
+<span class="token keyword">uint32_t</span> bits <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span><span class="token generic-function"><span class="token function">bit_cast</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token keyword">uint32_t</span><span class="token operator">></span></span></span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="union-的缺点">union 的缺点</h2>
+<h3 id="1-完全没有类型安全">1. 完全没有类型安全</h3>
+<p>编译器不知道——也不会帮你检查——当前哪个成员是活跃的。读错成员就是 UB，所有责任都在程序员身上：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">union</span> U <span class="token punctuation">&#123;</span> <span class="token keyword">int</span> i<span class="token punctuation">;</span> <span class="token keyword">double</span> d<span class="token punctuation">;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+U u<span class="token punctuation">;</span>
+u<span class="token punctuation">.</span>d <span class="token operator">=</span> <span class="token number">3.14</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> x <span class="token operator">=</span> u<span class="token punctuation">.</span>i<span class="token punctuation">;</span>       <span class="token comment">// 未定义行为！当前活跃的是 d，却读了 i</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="2-不能包含-非平凡-类型的成员">2. 不能包含&quot;非平凡&quot;类型的成员</h3>
+<p>在 C++ 中，如果一个类型有自定义构造函数、析构函数、拷贝/移动操作（即非平凡特殊成员函数），它<strong>不能直接作为 union 的成员</strong>。因为编译器不知道该在什么时候调用谁的构造和析构。</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+
+<span class="token keyword">union</span> Bad
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span>         i<span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span>string s<span class="token punctuation">;</span>   <span class="token comment">// 编译报错！std::string 有非平凡的构造/析构/拷贝</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>将得到类似下面的报错：</p>
+<pre class="line-numbers language-none"><code class="language-none">main.cpp:12:9: error: use of deleted function &#39;Bad::Bad()&#39;
+   12 |     Bad b;
+      |         ^
+main.cpp:4:7: note: &#39;Bad::Bad()&#39; is implicitly deleted because the default definition would be ill-formed:
+    4 | union Bad
+      |       ^~~<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>C++11 起允许 union 包含非平凡类型，但你必须<strong>手动管理生命周期</strong>——通过 placement new 构造、显式调用析构函数销毁：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;new></span></span>
+
+<span class="token keyword">union</span> ManualString
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span>         i<span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span>string s<span class="token punctuation">;</span>
+
+    <span class="token function">ManualString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">i</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>     <span class="token comment">// 默认激活 int</span>
+    <span class="token operator">~</span><span class="token function">ManualString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>            <span class="token comment">// 析构函数留空——手动管理！</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    ManualString ms<span class="token punctuation">;</span>
+
+    <span class="token comment">// 激活 string 成员——使用 placement new</span>
+    <span class="token keyword">new</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>ms<span class="token punctuation">.</span>s<span class="token punctuation">)</span> std<span class="token double-colon punctuation">::</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token string">"Hello, Union!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> ms<span class="token punctuation">.</span>s <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>   <span class="token comment">// 输出: Hello, Union!</span>
+
+    <span class="token comment">// 用完必须手动析构！</span>
+    ms<span class="token punctuation">.</span>s<span class="token punctuation">.</span><span class="token operator">~</span><span class="token function">basic_string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>一旦忘记手动析构，<code>std::string</code> 内部在堆上分配的字符串缓冲区就会泄漏。这种写法容易出错，极少被推荐。</p>
+<h3 id="3-缺乏工程安全性">3. 缺乏工程安全性</h3>
+<ul>
+<li><strong>无默认的构造/析构</strong>：编译器删除默认特殊成员函数，必须完全手写。</li>
+<li><strong>无活跃成员查询</strong>：运行时完全无法获知哪个成员是活跃的。</li>
+<li><strong>异常不安全</strong>：如果在构造新成员时抛出异常，union 的状态被破坏，不清楚谁在活跃。</li>
+<li><strong>维护困难</strong>：每新增一种成员类型，所有 switch/if-else 分支都需要同步修改，容易遗漏。</li>
+</ul>
+<blockquote>
+<p><strong>简单总结</strong>：union 是 C 语言遗产，在 C++ 中仍有用——主要用于内存受限场景和底层字节操作。但在业务逻辑中使用 union，几乎等同于放弃了 C++ 的类型系统对你的保护。</p>
+</blockquote>
+<hr>
+<h1>std::variant</h1>
+<p><code>std::variant</code> 是 C++17 引入的<strong>类型安全的联合体</strong>，定义在头文件 <code>&lt;variant&gt;</code>。它解决了 union 的所有核心缺陷：自动管理生命周期、编译期类型检查、运行时查询活跃成员。</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;variant></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token comment">// 定义一个 variant，可以存储 int 或 double 或 std::string</span>
+    std<span class="token double-colon punctuation">::</span>variant<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">double</span><span class="token punctuation">,</span> std<span class="token double-colon punctuation">::</span>string<span class="token operator">></span> v<span class="token punctuation">;</span>
+
+    v <span class="token operator">=</span> <span class="token number">42</span><span class="token punctuation">;</span>                             <span class="token comment">// 存入 int</span>
+    v <span class="token operator">=</span> <span class="token number">3.14</span><span class="token punctuation">;</span>                           <span class="token comment">// 替换为 double</span>
+    v <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token string">"Hello, Variant!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 替换为 std::string</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>std::variant&lt;int, double, std::string&gt;</code> 表示&quot;这个变量可以是 int、double 或 std::string 中的任意一种&quot;。每次赋值都会：</p>
+<ol>
+<li>销毁旧的值（调用对应类型的析构函数）</li>
+<li>在新位置构造新的值（调用对应类型的构造函数）</li>
+</ol>
+<hr>
+<h2 id="std-variant-的内存布局">std::variant 的内存布局</h2>
+<p><code>std::variant</code> 内部需要存放<strong>最坏情况下最大的那个类型</strong>的存储空间，再加上一个**判别器（discriminator）**来记录当前活跃的是第几个类型。</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;variant></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">using</span> VarType <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span>variant<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">double</span><span class="token punctuation">,</span> std<span class="token double-colon punctuation">::</span>string<span class="token operator">></span><span class="token punctuation">;</span>
+
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"sizeof(int)          = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>           <span class="token comment">// 4</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"sizeof(double)       = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">double</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>        <span class="token comment">// 8</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"sizeof(std::string)  = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>std<span class="token double-colon punctuation">::</span>string<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>   <span class="token comment">// 32</span>
+
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"sizeof(VarType)      = "</span> <span class="token operator">&lt;&lt;</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>VarType<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p><strong>内存开销总结</strong>：<code>std::variant&lt;T...&gt;</code> 的大小 ≈ <code>max(sizeof(T)...)</code> + 判别器大小。判断器通常占 1~8 字节，取决于类型的个数和平台的对齐规则。这意味着相比于手动 tagged union（你必须自己声明 tag 变量+union），<code>std::variant</code> 的内存开销是接近的，但多了类型安全和自动生命周期管理。</p>
+</blockquote>
+<hr>
+<h2 id="访问-std-variant-的值">访问 std::variant 的值</h2>
+<h3 id="std-get-类型-索引-：按类型或索引取值">std::get&lt;类型/索引&gt;：按类型或索引取值</h3>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;variant></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    std<span class="token double-colon punctuation">::</span>variant<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">double</span><span class="token punctuation">,</span> std<span class="token double-colon punctuation">::</span>string<span class="token operator">></span> v<span class="token punctuation">;</span>
+
+    v <span class="token operator">=</span> <span class="token number">3.14</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 按类型访问</span>
+    <span class="token keyword">double</span> d <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span><span class="token generic-function"><span class="token function">get</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token keyword">double</span><span class="token operator">></span></span></span><span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> d <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>             <span class="token comment">// 输出: 3.14</span>
+
+    <span class="token comment">// 按索引访问——0=int, 1=double, 2=std::string</span>
+    <span class="token keyword">double</span> d2 <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span><span class="token generic-function"><span class="token function">get</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token number">1</span><span class="token operator">></span></span></span><span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> d2 <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>            <span class="token comment">// 输出: 3.14</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>如果取错了类型</strong>，<code>std::get</code> 会抛出 <code>std::bad_variant_access</code> 异常：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;variant></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    std<span class="token double-colon punctuation">::</span>variant<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">double</span><span class="token operator">></span> v<span class="token punctuation">;</span>
+    v <span class="token operator">=</span> <span class="token number">42</span><span class="token punctuation">;</span>                              <span class="token comment">// 当前活跃的是 int</span>
+
+    <span class="token keyword">try</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">double</span> d <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span><span class="token generic-function"><span class="token function">get</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token keyword">double</span><span class="token operator">></span></span></span><span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 错误：活跃的是 int</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token keyword">const</span> std<span class="token double-colon punctuation">::</span>bad_variant_access<span class="token operator">&amp;</span> e<span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"异常: "</span> <span class="token operator">&lt;&lt;</span> e<span class="token punctuation">.</span><span class="token function">what</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>编译并运行后输出：</p>
+<pre class="line-numbers language-none"><code class="language-none">异常: bad variant access<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="std-get-if：安全地-尝试取值">std::get_if：安全地&quot;尝试取值&quot;</h3>
+<p><code>std::get_if&lt;T&gt;(&amp;v)</code> 返回<strong>指针</strong>而不是引用：如果当前活跃类型是 <code>T</code>，返回指向该值的指针；否则返回 <code>nullptr</code>。</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;variant></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    std<span class="token double-colon punctuation">::</span>variant<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">double</span><span class="token punctuation">,</span> std<span class="token double-colon punctuation">::</span>string<span class="token operator">></span> v<span class="token punctuation">;</span>
+
+    v <span class="token operator">=</span> <span class="token number">42</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 尝试取 int——成功</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token operator">*</span> p <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span><span class="token generic-function"><span class="token function">get_if</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span></span></span><span class="token punctuation">(</span><span class="token operator">&amp;</span>v<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"int: "</span> <span class="token operator">&lt;&lt;</span> <span class="token operator">*</span>p <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>     <span class="token comment">// 输出: int: 42</span>
+    <span class="token keyword">else</span>
+        std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"不是 int"</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+
+    <span class="token comment">// 尝试取 double——失败</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">double</span><span class="token operator">*</span> p <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span><span class="token generic-function"><span class="token function">get_if</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token keyword">double</span><span class="token operator">></span></span></span><span class="token punctuation">(</span><span class="token operator">&amp;</span>v<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"double: "</span> <span class="token operator">&lt;&lt;</span> <span class="token operator">*</span>p <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+    <span class="token keyword">else</span>
+        std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"不是 double"</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>      <span class="token comment">// 输出: 不是 double</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>std::get_if</code> 不抛异常，特别适合在分支逻辑中快速判断。</p>
+<h3 id="std-visit：对所有可能的类型执行操作">std::visit：对所有可能的类型执行操作</h3>
+<p><code>std::visit</code> 是最强大的访问方式——它接受一个**可调用对象（访问器）**和一个 <code>variant</code>，编译器会自动生成所有类型的分支跳转：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;variant></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    std<span class="token double-colon punctuation">::</span>variant<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">double</span><span class="token punctuation">,</span> std<span class="token double-colon punctuation">::</span>string<span class="token operator">></span> v<span class="token punctuation">;</span>
+
+    <span class="token comment">// 定义 visitor——重载了 operator() 的结构体</span>
+    <span class="token keyword">struct</span> <span class="token class-name">Visitor</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">void</span> <span class="token keyword">operator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token punctuation">)</span>         <span class="token keyword">const</span> <span class="token punctuation">&#123;</span> std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"int: "</span> <span class="token operator">&lt;&lt;</span> i <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+        <span class="token keyword">void</span> <span class="token keyword">operator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">double</span> d<span class="token punctuation">)</span>      <span class="token keyword">const</span> <span class="token punctuation">&#123;</span> std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"double: "</span> <span class="token operator">&lt;&lt;</span> d <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+        <span class="token keyword">void</span> <span class="token keyword">operator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">const</span> std<span class="token double-colon punctuation">::</span>string<span class="token operator">&amp;</span> s<span class="token punctuation">)</span> <span class="token keyword">const</span> <span class="token punctuation">&#123;</span> std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"string: "</span> <span class="token operator">&lt;&lt;</span> s <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+    v <span class="token operator">=</span> <span class="token number">42</span><span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span><span class="token function">visit</span><span class="token punctuation">(</span>Visitor<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span> v<span class="token punctuation">)</span><span class="token punctuation">;</span>              <span class="token comment">// 输出: int: 42</span>
+
+    v <span class="token operator">=</span> <span class="token number">3.14</span><span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span><span class="token function">visit</span><span class="token punctuation">(</span>Visitor<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span> v<span class="token punctuation">)</span><span class="token punctuation">;</span>              <span class="token comment">// 输出: double: 3.14</span>
+
+    v <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token string">"你好"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span><span class="token function">visit</span><span class="token punctuation">(</span>Visitor<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span> v<span class="token punctuation">)</span><span class="token punctuation">;</span>              <span class="token comment">// 输出: string: 你好</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>也可以用 C++17 的泛型 lambda 简化书写：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">auto</span> printer <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> val<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"值是: "</span> <span class="token operator">&lt;&lt;</span> val <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+std<span class="token double-colon punctuation">::</span><span class="token function">visit</span><span class="token punctuation">(</span>printer<span class="token punctuation">,</span> v<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="std-visit-的底层实现与性能">std::visit 的底层实现与性能</h2>
+<p><code>std::visit</code> 不是简单的 <code>if-else</code> 链，编译器通常将其展开为<strong>跳转表（jump table）</strong>：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">// 编译器在内部大致生成等价于以下伪代码的汇编：</span>
+<span class="token comment">//</span>
+<span class="token comment">// switch (v.index()) &#123;</span>
+<span class="token comment">// case 0: return visitor(get&lt;0>(v));</span>
+<span class="token comment">// case 1: return visitor(get&lt;1>(v));</span>
+<span class="token comment">// case 2: return visitor(get&lt;2>(v));</span>
+<span class="token comment">// &#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>时间复杂度为 <strong>O(1)</strong>——一次索引读取 + 一次跳转，与 variant 中类型的数量无关（在合理范围内）。</li>
+<li>如果 visitor 的每个 <code>operator()</code> 返回相同类型，<code>std::visit</code> 本身也是表达式，可直接用于赋值和 <code>return</code>。</li>
+<li>编译器还能对 visit 做内联优化，将整个调用展开为直接对活跃成员的操作。</li>
+</ul>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">// visit 的返回值</span>
+<span class="token keyword">auto</span> length <span class="token operator">=</span> std<span class="token double-colon punctuation">::</span><span class="token function">visit</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> s<span class="token punctuation">)</span> <span class="token operator">-></span> size_t
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> std<span class="token double-colon punctuation">::</span><span class="token function">size</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>      <span class="token comment">// 适用于 std::string 和有 .size() 的类型</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">,</span> v<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="std-variant-的安全性">std::variant 的安全性</h2>
+<h3 id="编译期类型检查">编译期类型检查</h3>
+<p><code>std::variant</code> 的类型列表在编译期就完全确定。如果你试图 <code>get&lt;NotListed&gt;()</code>，会在<strong>编译时</strong>报错：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">std<span class="token double-colon punctuation">::</span>variant<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">double</span><span class="token operator">></span> v<span class="token punctuation">;</span>
+v <span class="token operator">=</span> <span class="token number">3.14f</span><span class="token punctuation">;</span>         <span class="token comment">// OK：float 可隐式转为 int 或 double（此处优先匹配 double）</span>
+<span class="token comment">// auto x = std::get&lt;float>(v);   // 编译报错：float 不在类型列表中</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h3 id="运行时类型检查">运行时类型检查</h3>
+<ul>
+<li><code>std::get</code> 在类型不匹配时抛出 <code>std::bad_variant_access</code>（运行时检查）。</li>
+<li><code>std::get_if</code> 在类型不匹配时返回 <code>nullptr</code>，不抛异常。</li>
+<li><code>v.index()</code> 返回当前活跃类型的索引（编译期常量），可以用于 switch。</li>
+</ul>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">std<span class="token double-colon punctuation">::</span>variant<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">double</span><span class="token punctuation">,</span> std<span class="token double-colon punctuation">::</span>string<span class="token operator">></span> v<span class="token punctuation">;</span>
+v <span class="token operator">=</span> <span class="token number">3.14</span><span class="token punctuation">;</span>
+std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"当前活跃类型索引: "</span> <span class="token operator">&lt;&lt;</span> v<span class="token punctuation">.</span><span class="token function">index</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>   <span class="token comment">// 输出: 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h3 id="“valueless-by-exception”——当构造失败时">“valueless_by_exception”——当构造失败时</h3>
+<p>如果在对 <code>variant</code> 赋值时：</p>
+<ol>
+<li>先销毁了旧值</li>
+<li>然后在构造新值时抛出了异常</li>
+</ol>
+<p>那么 <code>variant</code> 会进入一个特殊的 <strong>valueless_by_exception</strong> 状态：它不持有任何合法的值。</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;variant></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+
+<span class="token keyword">struct</span> <span class="token class-name">MayThrow</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token function">MayThrow</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+    <span class="token function">MayThrow</span><span class="token punctuation">(</span><span class="token keyword">const</span> MayThrow<span class="token operator">&amp;</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">throw</span> std<span class="token double-colon punctuation">::</span><span class="token function">runtime_error</span><span class="token punctuation">(</span><span class="token string">"拷贝失败"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    std<span class="token double-colon punctuation">::</span>variant<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> MayThrow<span class="token operator">></span> v<span class="token punctuation">;</span>
+    v <span class="token operator">=</span> <span class="token number">42</span><span class="token punctuation">;</span>                  <span class="token comment">// 当前持有 int</span>
+
+    MayThrow mt<span class="token punctuation">;</span>
+    <span class="token keyword">try</span>
+    <span class="token punctuation">&#123;</span>
+        v <span class="token operator">=</span> mt<span class="token punctuation">;</span>              <span class="token comment">// 尝试替换为 MayThrow</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 构造 MayThrow 时抛异常，v 可能变成 valueless</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>v<span class="token punctuation">.</span><span class="token function">valueless_by_exception</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"variant 处于无效状态！"</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这是 <code>variant</code> 最危险的边缘情况。好在只有当类型列表中的类型<strong>可能抛出</strong>时才出现，且通常在异常后应当立即重建一个已知良好的值：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">if</span> <span class="token punctuation">(</span>v<span class="token punctuation">.</span><span class="token function">valueless_by_exception</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    v <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>        <span class="token comment">// 用 int 重新初始化，恢复有效状态</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="与-union-的对比">与 union 的对比</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center"><code>union</code></th>
+<th style="text-align:center"><code>std::variant</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>类型安全</strong></td>
+<td style="text-align:center">完全无，读错即 UB</td>
+<td style="text-align:center">编译期+运行时双重检查</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>非平凡类型</strong></td>
+<td style="text-align:center">C++11 前不支持；之后需手动管理生命周期</td>
+<td style="text-align:center">完全支持</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>活跃成员查询</strong></td>
+<td style="text-align:center">无，必须手动标记</td>
+<td style="text-align:center"><code>v.index()</code> / <code>std::holds_alternative</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>内存开销</strong></td>
+<td style="text-align:center">sizeof(最大成员) + 对齐</td>
+<td style="text-align:center">sizeof(最大成员) + 判别器（1~8 字节）</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>访问方式</strong></td>
+<td style="text-align:center">直接 <code>.member</code></td>
+<td style="text-align:center"><code>get</code> / <code>get_if</code> / <code>visit</code>（异常安全）</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>新增类型成本</strong></td>
+<td style="text-align:center">改 enum + 改所有 switch 分支</td>
+<td style="text-align:center">改类型列表 + 编译器强制补全 visitor</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>运行时性能</strong></td>
+<td style="text-align:center">直接内存访问，零开销</td>
+<td style="text-align:center">get/visit 几乎零开销（跳转表 O(1)）</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>适用场景</strong></td>
+<td style="text-align:center">底层字节操作、C 接口兼容</td>
+<td style="text-align:center">业务逻辑、状态机、多态替代</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/C/">C++</a><a class="post-meta__tags" href="/tags/C-%E8%BF%9B%E9%98%B6/">C++进阶</a></div></div><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/07/22/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E4%B8%8ERAII/" title="智能指针与RAII"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">智能指针与RAII</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  指针   原始指针的缺点 原始指针/裸指针：如int* p，需要手动管理内存，容易造成以下问题： 1. 忘记delete/free会导致内存泄露: // 局部变量 ptr 指向的堆内存未释放，造成内存泄露 void func &#123;     Type* ptr = new Type();     ptr->do_something(); &#125; 2.使用释放后的悬挂指针，导致未定义行为： Type* ptr = new Type(); delete ptr; ptr->do_something(); 3. 重复释放同一块内存，导致未定义行为或程序崩溃 Type* ptr = new Type(); delete ptr; delete ptr;       // 重复释放同一块内存  RAII（Resource Acquisition Is Initialization） RAII（直译为“资源获取即初始化”）：在 对象构造阶段获取资源，在 对象析构阶段释放资源；依靠 C++ 对象自动生命周期管理（离开作用域自动调用析构），保证资源一定会被释...</div></div></div></a><a class="pagination-related" href="/2026/07/22/%E5%87%BD%E6%95%B0%E6%8C%87%E9%92%88%E4%B8%8Estd-function/" title="函数指针与std::function"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">函数指针与std::function</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  函数 指针   函数指针  函数的地址 函数的机器指令存储在内存的.text段里，每个函数对应.text段中的一段连续的机器指令序列，其起始地址（即函数第一条指令所在的内存地址）就是这个函数的地址。  函数指针 函数指针是指向函数的指针类型，它存储函数的入口地址，通过这个地址可以间接调用对应的函数。 其声明语法为返回值类型 (*函数指针名)(参数列表)： int add(int a, int b); int (*p)(int, int);   // p 是类型为 int (*)(int, int)的函数的指针 函数名也可以隐式转换为函数的入口地址 因此有以下两种等价的写法： int (*p)(int, int) = add; int (*p)(int, int) = &amp;add; 调用函数指针也有等价的两种写法： std::cout &lt;&lt; p(1, 2) &lt;&lt; std::endl; std::cout &lt;&lt; (*p)(1, 2) &lt;&lt; std::endl;  std::function std...</div></div></div></a><a class="pagination-related" href="/2026/07/22/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F/" title="Lambda表达式"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">Lambda表达式</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  函数   lambda 表达式 通过使用lambda表达式可以在代码中就地定义短小的函数逻辑，同时能捕获外层作用域的变量作为内部状态，其核心语法如下： [捕获列表](参数列表) &#123;     函数体 &#125; 例如： []() &#123; std::cout &lt;&lt; "this is lambda!" &lt;&lt; std::endl; &#125; 1. 无参数时，括号可以省略 [] &#123; std::cout &lt;&lt; "this is lambda!" &lt;&lt; std::endl; &#125; 2. 可以在函数体后紧跟一个括号，表示直接调用该匿名函数 [] &#123; std::cout &lt;&lt; "this is lambda!" &lt;&lt; std::endl; &#125;();  lambda 表达式的捕获方式 值捕获 值捕获：捕获变量的副本，在lambda定义时完成拷贝。  显式捕获：写法为[变量名1, 变量名2, ...]，用于显式捕获外界的变量 隐式捕获：写法为[=...</div></div></div></a><a class="pagination-related" href="/2026/07/22/%E6%95%B0%E7%BB%84%E5%90%8D%E9%80%80%E5%8C%96%E4%B8%BA%E6%8C%87%E9%92%88/" title="数组名退化为指针"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">数组名退化为指针</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  数组 指针   数组到指针的退化 数组名出现在大多数表达式中，会被编译器自动转化为指向数组首元素的指针： int arr[5] = &#123; 1, 2, 3, 4, 5 &#125;; int* p = arr;        // arr 这里的含义为 &amp;arr[0]，类型为 int* 1. 下标访问arr[i]在底层等价于*(arr + i) 甚至可以可以有3[arr]这样的写法，和arr[3]等效： #include &lt;iostream>  int main() &#123;     int arr[5] = &#123; 1, 2, 3, 4, 5 &#125;;     std::cout &lt;&lt; 3[arr] &lt;&lt; std::endl;   // 并不建议的写法      return 0; &#125; 2. 可以用指针的方式访问数组，或用数组的方式访问指针 #include &lt;iostream>    int main() &#123;     int arr[5] = &#123; ...</div></div></div></a><a class="pagination-related" href="/2026/07/21/%E5%86%85%E5%AD%98%E5%9F%BA%E7%A1%80/" title="内存基础"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-21</div><div class="info-item-2">内存基础</div></div><div class="info-2"><div class="info-item-1"> 进制 在基数为 R 的进制中,包含 R 个数字符号, 分别是 0, 1, 2, …, R-1 一个整数n位、小数m位的R进制数字，可以表示为： (N)R=(Kn−1Kn−2...K0.K−1K−2...K−m)R(N)_{R} = (K_{n-1} K_{n-2} ... K_0.K_{-1}K_{-2}...K_{-m})_{R} (N)R​=(Kn−1​Kn−2​...K0​.K−1​K−2​...K−m​)R​ 其中，KiK_iKi​ 是第 iii 位上的数字符号，满足 0≤Ki&lt;R0 \leq K_i &lt; R0≤Ki​&lt;R。 同时，也可以用连加符号来表示： (N)R=∑i=−mn−1KiRi(N)_{R} = \sum_{i=-m}^{n-1} K_i R^i (N)R​=i=−m∑n−1​Ki​Ri  二进制 二进制是基数为 2 的进制系统，使用两个数字符号：0 和 1。每一位上的权重是 2 的幂次方。 如： (1101)2=1∗23+1∗22+0∗21+1∗20=8+4+0+1=(13)10(1101)_2 = 1 * 2^3 + 1 * 2^2 ...</div></div></div></a><a class="pagination-related" href="/2026/07/22/%E6%95%B0%E7%BB%84/" title="数组"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">数组</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  变量与常量   数组 数组（Array）：同一类型数据的连续内存集合。 数组中的所有元素的类型都相同，并且长度固定，C++中可以用[]运算符来定义数组： // 类型 数组名[数组长度] int arr[5];         // 长度为5的 int 类型的整数数组 char str[100];      // 长度为100的 char 类型变量的字符数组（字符串）  通过[]运算符来访问数组元素 数组的下标索引从0开始： int main() &#123;     int arr[5];          arr[0] &#x3D; 10;     arr[4] &#x3D; 50;     arr[5] &#x3D; 100;    &#x2F;&#x2F; 错误，arr的下标范围是0~4，没有5 &#125;  常量数组 可以在定义数组的时候用const关键字来修饰数组元素，使得数组的每一个元素的值都不能被修改。 #include &lt;iostream>  int main() &#123;     const int arr[5] = &#1...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">颐大人</div><div class="author-info-description">叽里咕噜说什么呢，vivo50</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/286373468"><i class="fab fa-bilibili"></i><span>B站主页</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">联合（Union）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80"><span class="toc-number">1.1.</span> <span class="toc-text">内存布局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#union-%E7%9A%84%E5%AF%B9%E9%BD%90%E8%A7%84%E5%88%99"><span class="toc-number">1.2.</span> <span class="toc-text">union 的对齐规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D-union"><span class="toc-number">1.3.</span> <span class="toc-text">匿名 union</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#union-%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">1.4.</span> <span class="toc-text">union 的应用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%B8%A6%E6%A0%87%E7%AD%BE%E7%9A%84%E8%81%94%E5%90%88%EF%BC%88Tagged-Union%EF%BC%89"><span class="toc-number">1.4.1.</span> <span class="toc-text">1. 带标签的联合（Tagged Union）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%B1%BB%E5%9E%8B%E5%8F%8C%E5%85%B3%EF%BC%88Type-Punning%EF%BC%89"><span class="toc-number">1.4.2.</span> <span class="toc-text">2. 类型双关（Type Punning）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#union-%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="toc-number">1.5.</span> <span class="toc-text">union 的缺点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%8C%E5%85%A8%E6%B2%A1%E6%9C%89%E7%B1%BB%E5%9E%8B%E5%AE%89%E5%85%A8"><span class="toc-number">1.5.1.</span> <span class="toc-text">1. 完全没有类型安全</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E4%B8%8D%E8%83%BD%E5%8C%85%E5%90%AB-%E9%9D%9E%E5%B9%B3%E5%87%A1-%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%88%90%E5%91%98"><span class="toc-number">1.5.2.</span> <span class="toc-text">2. 不能包含&quot;非平凡&quot;类型的成员</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%BC%BA%E4%B9%8F%E5%B7%A5%E7%A8%8B%E5%AE%89%E5%85%A8%E6%80%A7"><span class="toc-number">1.5.3.</span> <span class="toc-text">3. 缺乏工程安全性</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">std::variant</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#std-variant-%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80"><span class="toc-number">2.1.</span> <span class="toc-text">std::variant 的内存布局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BF%E9%97%AE-std-variant-%E7%9A%84%E5%80%BC"><span class="toc-number">2.2.</span> <span class="toc-text">访问 std::variant 的值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#std-get-%E7%B1%BB%E5%9E%8B-%E7%B4%A2%E5%BC%95-%EF%BC%9A%E6%8C%89%E7%B1%BB%E5%9E%8B%E6%88%96%E7%B4%A2%E5%BC%95%E5%8F%96%E5%80%BC"><span class="toc-number">2.2.1.</span> <span class="toc-text">std::get&lt;类型&#x2F;索引&gt;：按类型或索引取值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#std-get-if%EF%BC%9A%E5%AE%89%E5%85%A8%E5%9C%B0-%E5%B0%9D%E8%AF%95%E5%8F%96%E5%80%BC"><span class="toc-number">2.2.2.</span> <span class="toc-text">std::get_if：安全地&quot;尝试取值&quot;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#std-visit%EF%BC%9A%E5%AF%B9%E6%89%80%E6%9C%89%E5%8F%AF%E8%83%BD%E7%9A%84%E7%B1%BB%E5%9E%8B%E6%89%A7%E8%A1%8C%E6%93%8D%E4%BD%9C"><span class="toc-number">2.2.3.</span> <span class="toc-text">std::visit：对所有可能的类型执行操作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#std-visit-%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E4%B8%8E%E6%80%A7%E8%83%BD"><span class="toc-number">2.3.</span> <span class="toc-text">std::visit 的底层实现与性能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#std-variant-%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7"><span class="toc-number">2.4.</span> <span class="toc-text">std::variant 的安全性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E8%AF%91%E6%9C%9F%E7%B1%BB%E5%9E%8B%E6%A3%80%E6%9F%A5"><span class="toc-number">2.4.1.</span> <span class="toc-text">编译期类型检查</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E6%97%B6%E7%B1%BB%E5%9E%8B%E6%A3%80%E6%9F%A5"><span class="toc-number">2.4.2.</span> <span class="toc-text">运行时类型检查</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%9Cvalueless-by-exception%E2%80%9D%E2%80%94%E2%80%94%E5%BD%93%E6%9E%84%E9%80%A0%E5%A4%B1%E8%B4%A5%E6%97%B6"><span class="toc-number">2.4.3.</span> <span class="toc-text">“valueless_by_exception”——当构造失败时</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8E-union-%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="toc-number">2.5.</span> <span class="toc-text">与 union 的对比</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/07/24/%E8%81%94%E5%90%88%E4%B8%8Estd-variant/" title="联合与std::variant"><img src="/img/cpp.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="联合与std::variant"/></a><div class="content"><a class="title" href="/2026/07/24/%E8%81%94%E5%90%88%E4%B8%8Estd-variant/" title="联合与std::variant">联合与std::variant</a><time datetime="2026-07-24T15:34:59.000Z" title="发表于 2026-07-24 23:34:59">2026-07-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/22/%E5%87%BD%E6%95%B0%E6%8C%87%E9%92%88%E4%B8%8Estd-function/" title="函数指针与std::function"><img src="/img/cpp.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="函数指针与std::function"/></a><div class="content"><a class="title" href="/2026/07/22/%E5%87%BD%E6%95%B0%E6%8C%87%E9%92%88%E4%B8%8Estd-function/" title="函数指针与std::function">函数指针与std::function</a><time datetime="2026-07-22T14:05:34.000Z" title="发表于 2026-07-22 22:05:34">2026-07-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/22/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F/" title="Lambda表达式"><img src="/img/cpp.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Lambda表达式"/></a><div class="content"><a class="title" href="/2026/07/22/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F/" title="Lambda表达式">Lambda表达式</a><time datetime="2026-07-22T14:02:50.000Z" title="发表于 2026-07-22 22:02:50">2026-07-22</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By 颐大人</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.2</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.6.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.6.0"></script><script src="/js/main.js?v=5.6.0"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
