@@ -1,0 +1,138 @@
+/* ============================================================
+ * Atom One Dark — PrismJS 代码高亮配色
+ * 移植自 VSCode gradient-atom-one-dark 主题
+ * 修改此文件后运行 hexo generate 即可生效
+ *
+ * 色板速查：
+ *   背景 #282C34  |  前景 #ABB2BF  |  注释 #5C6370 斜体
+ *   关键字 #C678DD (渐变) |  字符串 #98C379 |  数字 #D19A66
+ *   函数 #61AFEF (渐变)   |  类名 #E5C07B  |  内建 #E06C75 (渐变)
+ * ============================================================ */
+
+/* ---------- 代码块背景 / UI ---------- */
+:root,
+[data-theme='dark'] {
+  --hl-color:       #ABB2BF;     /* 默认文字颜色 */
+  --hl-bg:          #282C34;     /* 代码块背景 */
+  --hltools-bg:     #21252B;     /* 工具栏背景 */
+  --hltools-color:  #9DA5B4;     /* 工具栏文字 */
+  --hlnumber-bg:    #282C34;     /* 行号列背景 */
+  --hlnumber-color: #636D83;     /* 行号文字 */
+  --hlscrollbar-bg: #4E566680;   /* 滚动条 */
+}
+
+/* 代码块整体背景统一 */
+pre[class*='language-'],
+pre[class*='language-'] code {
+  background: #282C34 !important;
+}
+
+/* ---------- Token 配色 ---------- */
+
+/* 注释 — 灰色，斜体 */
+pre[class*='language-'] .token.comment,
+pre[class*='language-'] .token.prolog,
+pre[class*='language-'] .token.doctype,
+pre[class*='language-'] .token.cdata {
+  color: #5C6370;
+  font-style: italic;
+}
+
+/* 关键字 + 类型名 (return, class, if, int, void, double…) — 渐变紫色 */
+pre[class*='language-'] .token.keyword {
+  color: #C678DD;
+  background-image: linear-gradient(45deg, #c678dd, #e398f5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* #include #define 中的 # 号 — 紫色 */
+pre[class*='language-'] .token.directive-hash {
+  color: #C678DD;
+}
+
+/* #include #define 中的指令名 (include, define…) — 紫色 */
+pre[class*='language-'] .token.directive.keyword {
+  color: #C678DD;
+}
+
+/* 头文件名 <iostream> 、字符串 "hello" — 绿色 */
+pre[class*='language-'] .token.string {
+  color: #98C379;
+}
+
+/* 字符 'a' '\\n' — 绿色（同字符串） */
+pre[class*='language-'] .token.char {
+  color: #98C379;
+}
+
+/* 转义序列 \\n \\t \\0 — 青色 */
+pre[class*='language-'] .token.escape {
+  color: #56B6C2;
+}
+
+/* 数字 42 3.14 — 橙色 */
+pre[class*='language-'] .token.number {
+  color: #D19A66;
+}
+
+/* 函数名 main sort — 渐变蓝色 */
+pre[class*='language-'] .token.function {
+  color: #61AFEF;
+  background-image: linear-gradient(45deg, #61afef, #8fd3ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 类名/结构体名 — 黄色 */
+pre[class*='language-'] .token.class-name {
+  color: #E5C07B;
+}
+
+/* 宏属性 __cplusplus — 紫色 */
+pre[class*='language-'] .token.macro.property {
+  color: #C678DD;
+}
+
+/* 内建对象 cout cin endl std — 渐变红色 */
+pre[class*='language-'] .token.builtin {
+  color: #E06C75;
+  background-image: linear-gradient(45deg, #df4459, #ff9e8e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 布尔值 true false — 橙色 */
+pre[class*='language-'] .token.boolean {
+  color: #D19A66;
+}
+
+/* 运算符 + - = == << >> — 紫色（同关键字） */
+pre[class*='language-'] .token.operator {
+  color: #C678DD;
+}
+
+/* 标点 ; { } ( ) :: — 默认前景色 */
+pre[class*='language-'] .token.punctuation {
+  color: #ABB2BF;
+}
+
+/* HTML/XML 标签 — 红色 */
+pre[class*='language-'] .token.tag {
+  color: #E06C75;
+}
+
+/* diff 删除/新增 */
+pre[class*='language-'] .token.deleted  { color: #E06C75; }
+pre[class*='language-'] .token.inserted { color: #98C379; }
+
+pre[class*='language-'] .token.important,
+pre[class*='language-'] .token.bold {
+  font-weight: bold;
+}
+pre[class*='language-'] .token.italic {
+  font-style: italic;
+}
