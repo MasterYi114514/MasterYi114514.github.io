@@ -40,11 +40,11 @@ pre[class*='language-'] .token.cdata {
 
 /* 关键字 + 类型名 (return, class, if, int, void, double…) — 渐变紫色 */
 pre[class*='language-'] .token.keyword {
-  color: #C678DD;
-  background-image: linear-gradient(45deg, #c678dd, #e398f5);
+  background: linear-gradient(45deg, #c678dd, #e398f5);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 /* #include #define 中的 # 号 — 紫色 */
@@ -79,11 +79,11 @@ pre[class*='language-'] .token.number {
 
 /* 函数名 main sort — 渐变蓝色 */
 pre[class*='language-'] .token.function {
-  color: #61AFEF;
-  background-image: linear-gradient(45deg, #61afef, #8fd3ff);
+  background: linear-gradient(45deg, #61afef, #8fd3ff);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 /* 类名/结构体名 — 黄色 */
@@ -98,11 +98,11 @@ pre[class*='language-'] .token.macro.property {
 
 /* 内建对象 cout cin endl std — 渐变红色 */
 pre[class*='language-'] .token.builtin {
-  color: #E06C75;
-  background-image: linear-gradient(45deg, #df4459, #ff9e8e);
+  background: linear-gradient(45deg, #df4459, #ff9e8e);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 /* 布尔值 true false — 橙色 */
@@ -135,4 +135,112 @@ pre[class*='language-'] .token.bold {
 }
 pre[class*='language-'] .token.italic {
   font-style: italic;
+}
+
+/* =================================================================
+ * 阅读模式覆盖 — readmode.styl 会把代码块文字统一改成灰色，
+ * 这里用 !important 把代码块内所有元素的颜色恢复为 Atom One Dark
+ * ================================================================= */
+.read-mode {
+  /* 代码块背景强制深色 */
+  pre[class*='language-'],
+  pre[class*='language-'] code {
+    background: #282C34 !important;
+    color: #ABB2BF !important;
+  }
+  /* 恢复工具栏 */
+  .highlight-tools {
+    display: flex !important;
+  }
+  /* 注释 */
+  pre[class*='language-'] .token.comment,
+  pre[class*='language-'] .token.prolog,
+  pre[class*='language-'] .token.doctype,
+  pre[class*='language-'] .token.cdata {
+    color: #5C6370 !important;
+    -webkit-text-fill-color: #5C6370 !important;
+  }
+  /* 关键字 — 渐变紫色 */
+  pre[class*='language-'] .token.keyword {
+    background: linear-gradient(45deg, #c678dd, #e398f5) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+  }
+  /* 预处理指令 */
+  pre[class*='language-'] .token.directive-hash,
+  pre[class*='language-'] .token.directive.keyword {
+    color: #C678DD !important;
+    -webkit-text-fill-color: #C678DD !important;
+  }
+  /* 字符串 */
+  pre[class*='language-'] .token.string {
+    color: #98C379 !important;
+    -webkit-text-fill-color: #98C379 !important;
+  }
+  /* 字符 */
+  pre[class*='language-'] .token.char {
+    color: #98C379 !important;
+    -webkit-text-fill-color: #98C379 !important;
+  }
+  /* 转义 */
+  pre[class*='language-'] .token.escape {
+    color: #56B6C2 !important;
+    -webkit-text-fill-color: #56B6C2 !important;
+  }
+  /* 数字 */
+  pre[class*='language-'] .token.number {
+    color: #D19A66 !important;
+    -webkit-text-fill-color: #D19A66 !important;
+  }
+  /* 函数 — 渐变蓝色 */
+  pre[class*='language-'] .token.function {
+    background: linear-gradient(45deg, #61afef, #8fd3ff) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+  }
+  /* 类名 */
+  pre[class*='language-'] .token.class-name {
+    color: #E5C07B !important;
+    -webkit-text-fill-color: #E5C07B !important;
+  }
+  /* 宏属性 */
+  pre[class*='language-'] .token.macro.property {
+    color: #C678DD !important;
+    -webkit-text-fill-color: #C678DD !important;
+  }
+  /* 内建对象 — 渐变红色 */
+  pre[class*='language-'] .token.builtin {
+    background: linear-gradient(45deg, #df4459, #ff9e8e) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+  }
+  /* 布尔 */
+  pre[class*='language-'] .token.boolean {
+    color: #D19A66 !important;
+    -webkit-text-fill-color: #D19A66 !important;
+  }
+  /* 运算符 */
+  pre[class*='language-'] .token.operator {
+    color: #C678DD !important;
+    -webkit-text-fill-color: #C678DD !important;
+  }
+  /* 标点 */
+  pre[class*='language-'] .token.punctuation {
+    color: #ABB2BF !important;
+    -webkit-text-fill-color: #ABB2BF !important;
+  }
+  /* HTML 标签 */
+  pre[class*='language-'] .token.tag {
+    color: #E06C75 !important;
+    -webkit-text-fill-color: #E06C75 !important;
+  }
+  /* diff */
+  pre[class*='language-'] .token.deleted  { color: #E06C75 !important; -webkit-text-fill-color: #E06C75 !important; }
+  pre[class*='language-'] .token.inserted { color: #98C379 !important; -webkit-text-fill-color: #98C379 !important; }
 }
