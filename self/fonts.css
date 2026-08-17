@@ -1,0 +1,17 @@
+/* 宋体（SimSun）Web 字体声明
+ * 字体文件打包上传，确保所有用户看到一致的字体效果
+ * 来源：Windows 系统自带宋体 simsun.ttc (TrueType Collection)
+ * 仅应用于文章正文区域（#article-container），不影响导航、侧边栏等 UI 元素
+ */
+@font-face {
+  font-family: 'SimSun';
+  src: url('/self/fonts/simsun.ttc') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;  /* 先以系统字体显示，字体加载后切换 */
+}
+
+/* 仅文章内容区域使用宋体 */
+#article-container {
+  font-family: SimSun, 宋体, STSong, serif;
+}

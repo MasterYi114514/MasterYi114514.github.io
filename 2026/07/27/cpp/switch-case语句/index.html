@@ -1,0 +1,364 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>switch-case 语句 | CS学习从入门到入土</title><meta name="author" content="颐大人"><meta name="copyright" content="颐大人"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="需要预先学习：  [[if 语句]]   switch-case 语句 switch-case 语句是一种多分支选择结构，它根据一个整型表达式的值跳转到匹配的 case 标签处执行。基本语法如下： switch (表达式) &#123; case 常量1:     &#x2F;&#x2F; 匹配常量1时执行的代码     break; case 常量2:     &#x2F;&#x2F; 匹配常量2时执行的代码     break; d">
+<meta property="og:type" content="article">
+<meta property="og:title" content="switch-case 语句">
+<meta property="og:url" content="https://masteryi114514.github.io/2026/07/27/cpp/switch-case%E8%AF%AD%E5%8F%A5/index.html">
+<meta property="og:site_name" content="CS学习从入门到入土">
+<meta property="og:description" content="需要预先学习：  [[if 语句]]   switch-case 语句 switch-case 语句是一种多分支选择结构，它根据一个整型表达式的值跳转到匹配的 case 标签处执行。基本语法如下： switch (表达式) &#123; case 常量1:     &#x2F;&#x2F; 匹配常量1时执行的代码     break; case 常量2:     &#x2F;&#x2F; 匹配常量2时执行的代码     break; d">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://masteryi114514.github.io/img/cpp.jpg">
+<meta property="article:published_time" content="2026-07-27T05:10:59.000Z">
+<meta property="article:modified_time" content="2026-07-27T05:39:51.396Z">
+<meta property="article:author" content="颐大人">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://masteryi114514.github.io/img/cpp.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "switch-case 语句",
+  "url": "https://masteryi114514.github.io/2026/07/27/cpp/switch-case%E8%AF%AD%E5%8F%A5/",
+  "image": "https://masteryi114514.github.io/img/cpp.jpg",
+  "datePublished": "2026-07-27T05:10:59.000Z",
+  "dateModified": "2026-07-27T05:39:51.396Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "颐大人",
+      "url": "https://MasterYi114514.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.jpg"><link rel="canonical" href="https://masteryi114514.github.io/2026/07/27/cpp/switch-case%E8%AF%AD%E5%8F%A5/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.6.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '7F7F7F')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'switch-case 语句',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><link rel="stylesheet" href="/self/fonts.css"><link rel="stylesheet" href="/self/atom-one-dark.css"><meta name="generator" content="Hexo 8.1.2"></head><body><div class="bg-animation" id="web_bg" style="background-color: #27282A;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">25</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-folder"></i><span> 所有分类</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/Cpp/"><i class="fa-fw fas fa-code"></i><span> C++教程</span></a></li><li><a class="site-page child" href="/categories/CMake/"><i class="fa-fw fas fa-cogs"></i><span> CMake教程</span></a></li><li><a class="site-page child" href="/categories/OpenGL/"><i class="fa-fw fas fa-cube"></i><span> OpenGL学习记录</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/cpp.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"></a><a class="nav-page-title" href="/"><span class="site-name">switch-case 语句</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-folder"></i><span> 所有分类</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/Cpp/"><i class="fa-fw fas fa-code"></i><span> C++教程</span></a></li><li><a class="site-page child" href="/categories/CMake/"><i class="fa-fw fas fa-cogs"></i><span> CMake教程</span></a></li><li><a class="site-page child" href="/categories/OpenGL/"><i class="fa-fw fas fa-cube"></i><span> OpenGL学习记录</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">switch-case 语句</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-07-27T05:10:59.000Z" title="发表于 2026-07-27 13:10:59">2026-07-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-07-27T05:39:51.396Z" title="更新于 2026-07-27 13:39:51">2026-07-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Cpp/">Cpp</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>需要预先学习：</p>
+<ul>
+<li><a href="/2026/07/27/cpp/if 语句/">if 语句</a></li>
+</ul>
+<hr>
+<h1>1. switch-case 语句</h1>
+<p><code>switch-case</code> 语句是一种多分支选择结构，它根据一个<strong>整型表达式</strong>的值跳转到匹配的 <code>case</code> 标签处执行。基本语法如下：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">switch</span> <span class="token punctuation">(</span>表达式<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">case</span> 常量<span class="token number">1</span><span class="token operator">:</span>
+    <span class="token comment">// 匹配常量1时执行的代码</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token keyword">case</span> 常量<span class="token number">2</span><span class="token operator">:</span>
+    <span class="token comment">// 匹配常量2时执行的代码</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token keyword">default</span><span class="token operator">:</span>
+    <span class="token comment">// 没有任何 case 匹配时执行的代码</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>switch</code> 后面括号中的表达式必须是整型（<code>int</code>、<code>char</code>、<code>enum</code> 等），<code>case</code> 后面必须是<strong>常量表达式</strong>。程序会拿表达式的值依次与每个 <code>case</code> 的值比较，找到匹配的就跳过去执行；如果没有任何匹配，就执行 <code>default</code>（如果有的话）。</p>
+<hr>
+<h2 id="break-的用法">1.1 break 的用法</h2>
+<p><code>break</code> 语句用于跳出 <code>switch</code> 结构。<strong>如果没有 <code>break</code>，程序会继续执行下一个 <code>case</code> 中的代码</strong>——这个特性被称为&quot;<strong>穿透</strong>&quot;（fall-through）。</p>
+<p><strong>有 <code>break</code> 的情况（正常行为）：</strong></p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> day <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">;</span>
+
+<span class="token keyword">switch</span> <span class="token punctuation">(</span>day<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">case</span> <span class="token number">1</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"星期一"</span><span class="token punctuation">;</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>                          <span class="token comment">// 跳出 switch</span>
+<span class="token keyword">case</span> <span class="token number">2</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"星期二"</span><span class="token punctuation">;</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token keyword">case</span> <span class="token number">3</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"星期三"</span><span class="token punctuation">;</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token keyword">default</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"未知"</span><span class="token punctuation">;</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">// 输出：星期三</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>没有 <code>break</code> 的情况（穿透）：</strong></p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> day <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">;</span>
+
+<span class="token keyword">switch</span> <span class="token punctuation">(</span>day<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">case</span> <span class="token number">1</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"星期一"</span><span class="token punctuation">;</span>
+<span class="token keyword">case</span> <span class="token number">2</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"星期二"</span><span class="token punctuation">;</span>
+<span class="token keyword">case</span> <span class="token number">3</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"星期三"</span><span class="token punctuation">;</span>           <span class="token comment">// 从这里开始匹配</span>
+<span class="token keyword">default</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"未知"</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">// 输出：星期三未知</span>
+<span class="token comment">// 匹配 case 3 后没有 break，继续执行 default</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>穿透并非总是坏事。有时候你有意希望多个 <code>case</code> 共享同一段代码：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">switch</span> <span class="token punctuation">(</span>day<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">case</span> <span class="token number">1</span><span class="token operator">:</span>
+<span class="token keyword">case</span> <span class="token number">2</span><span class="token operator">:</span>
+<span class="token keyword">case</span> <span class="token number">3</span><span class="token operator">:</span>
+<span class="token keyword">case</span> <span class="token number">4</span><span class="token operator">:</span>
+<span class="token keyword">case</span> <span class="token number">5</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"工作日"</span><span class="token punctuation">;</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token keyword">case</span> <span class="token number">6</span><span class="token operator">:</span>
+<span class="token keyword">case</span> <span class="token number">7</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"周末"</span><span class="token punctuation">;</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p><strong>理解要点</strong>：<code>case</code> 只是一个&quot;入口标签&quot;，不是&quot;独立区块&quot;。进入后如果没有 <code>break</code> 拦住，就会一路往下。</p>
+</blockquote>
+<hr>
+<h2 id="在-case-中定义变量">1.2 在 case 中定义变量</h2>
+<p>如果在你的代码逻辑中，不同 case 需要定义同名的变量，你需要分别用花括号 <code>{}</code> 把它们包起来，形成独立的作用域：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">switch</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">case</span> <span class="token number">1</span><span class="token operator">:</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">int</span> a <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>      <span class="token comment">// case 1 中定义的变量</span>
+        <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> a<span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">case</span> <span class="token number">2</span><span class="token operator">:</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">int</span> a <span class="token operator">=</span> <span class="token number">20</span><span class="token punctuation">;</span>      <span class="token comment">// case 2 中定义的变量</span>
+        <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> a<span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">default</span><span class="token operator">:</span>
+        <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"其他情况"</span><span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p><strong>注意</strong>：原因是 <code>case</code> 标签之后的所有代码都在同一个作用域中，所以如果不加花括号，<code>case 1</code> 和 <code>case 2</code> 中的 <code>int a</code> 就会冲突。</p>
+</blockquote>
+<hr>
+<h1>2. switch-case 与 if-else 的比较</h1>
+<p><code>switch-case</code> 和 <code>if-else if-else</code> 都能实现多分支选择，但它们的适用场景和底层行为不同。</p>
+<hr>
+<h2 id="条件限制">2.1 条件限制</h2>
+<p><code>switch-case</code> 最关键的限制是：<strong><code>case</code> 标签必须是常量表达式</strong>，不能是变量。</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> x <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>
+<span class="token keyword">switch</span> <span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">case</span> <span class="token number">1</span><span class="token operator">:</span>             <span class="token comment">// 常量</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token keyword">case</span> <span class="token number">2</span> <span class="token operator">+</span> <span class="token number">3</span><span class="token operator">:</span>         <span class="token comment">// 常量表达式，编译期可计算</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token keyword">case</span> y<span class="token operator">:</span>             <span class="token comment">// 错误！y 是变量，不是常量</span>
+    <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>if-else if-else</code> 没有这个限制，每个条件可以是任意表达式：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> a <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> b <span class="token operator">=</span> <span class="token number">20</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span>a <span class="token operator">></span> b<span class="token punctuation">)</span>              <span class="token comment">// 变量参与的关系表达式</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token comment">// ...</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>a <span class="token operator">+</span> b <span class="token operator">></span> <span class="token number">50</span><span class="token punctuation">)</span>    <span class="token comment">// 任意表达式都可以</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token comment">// ...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>另外，<code>switch</code> 的表达式必须是整型，不能是 <code>float</code>、<code>double</code> 或 <code>std::string</code>。</p>
+<hr>
+<h2 id="效率层面">2.2 效率层面</h2>
+<p>在某些情况下，<code>switch-case</code> 比一长串 <code>if-else if-else</code> 效率更高。</p>
+<p><code>if-else if-else</code> 是<strong>逐个检查</strong>的——条件越多，越到后面的分支等待时间越长（O(n)）。</p>
+<p>而编译器可以为 <code>switch-case</code> 生成<strong>跳转表</strong>——当 <code>case</code> 的值比较密集时，编译器会生成一张表，直接算出目标地址一步跳过去（接近 O(1)）：</p>
+<pre class="line-numbers language-none"><code class="language-none">跳转表示意（编译器生成）：
+
+case 值      跳转地址
+--------    ---------
+   1    →    0x1000
+   2    →    0x1008
+   3    →    0x1010
+   4    →    0x1018<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p><strong>注</strong>：在现代编译器和硬件上，除非分支特别多，二者效率差异通常微乎其微——<strong>可读性优先</strong>。</p>
+</blockquote>
+<hr>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/C/">C++</a></div></div><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/07/22/cpp/%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E7%9A%84%E5%80%BC%E4%BC%A0%E9%80%92%E4%B8%8E%E5%BC%95%E7%94%A8%E4%BC%A0%E9%80%92%E3%80%81%E6%8C%87%E9%92%88%E4%BC%A0%E9%80%92%E7%9A%84%E5%8C%BA%E5%88%AB/" title="函数参数的值传递与引用传递、指针传递的区别"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">函数参数的值传递与引用传递、指针传递的区别</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  函数 引用与左右值 指针   形参与实参 形式参数（Parameter） 形参是函数定义或函数声明时，在参数列表中声明的变量，是函数内部用来接收外部数据的占位符。  函数未被调用时，不占用实际内存 函数被调用时，创建并初始化 函数执行结束后立即销毁   实际参数（Argument） 实参是调用函数时传递给函数的具体数据。 // a、b是形参 int add(int a, int b) &#123;     return a + b; &#125;  int main() &#123;     int x = 10, y = 20;          // x+y、x*y是实参     int res = add(x + y, x * y);     return 0; &#125;  值传递 形参是实参的一份独立拷贝，形参与实参占有不同的内存地址。  函数内对形参的修改都不会作用于外部的实参 如果参数的内存占用过大，频繁地拷贝会导致明显的性能问题  void swap(int x, int y) &#123;     int temp =...</div></div></div></a><a class="pagination-related" href="/2026/07/26/cpp/%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89%E4%B8%8Estd-move/" title="移动语义与std::move"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-26</div><div class="info-item-2">移动语义与std::move</div></div><div class="info-2"><div class="info-item-1">需要预先学习：  引用与左右值   移动语义 移动语义（Move Semantics）是 C++11 引入的一项重要特性，它的核心思想是：当你把一个对象的资源&quot;转移&quot;到另一个对象时，不需要做深拷贝，而是直接把指针/句柄&quot;偷&quot;过来，让原对象变成一个空壳。这样可以避免大量不必要的拷贝开销，大幅提升性能。  拷贝的缺点 在传统 C++ 中，对象的传递依赖拷贝。对于管理堆内存的类（如 std::string、std::vector），拷贝意味着：  分配新的堆内存 逐字节复制原对象的数据 原对象和目标对象各自拥有独立的内存  #include &lt;cstring> #include &lt;iostream>  class MyString &#123; public:     MyString(const char* str)     &#123;         _size = std::strlen(str);         _data = new char[_size + 1];         std::strcpy(_da...</div></div></div></a><a class="pagination-related" href="/2026/07/26/cpp/%E5%BC%95%E7%94%A8%E4%B8%8E%E6%8C%87%E9%92%88%E7%9A%84%E5%8C%BA%E5%88%AB/" title="引用与指针的区别"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-26</div><div class="info-item-2">引用与指针的区别</div></div><div class="info-2"><div class="info-item-1">需要预先学习：  指针 指针常量与常量指针 引用与左右值   语法层面 指针的值是地址，需要通过解引用操作符*来访问指针所指向的对象，而引用是一个已存在变量的别名，可以直接使用引用名来访问变量。 int num = 10; int* ptr = &amp;num; int&amp; ref = num;  std::cout &lt;&lt; *ptr &lt;&lt; std::endl; std::cout &lt;&lt; ref &lt;&lt; std::endl;  资源持有层面 引用天然地不支持更换对象，而指针需要在*后加const修饰才能实现类似语义： int&amp; ref = num;      // ref 永远绑定 num ref = num2;          // 这是把 num2 的值赋给 num，而不是让 ref 绑定 num2  // 相当于: int* const ptr = &amp;num;      // ptr 永远指向 num  内存层面 引用在一些实现中不占用额外的内存空间，而指针是一个变量，会占用一定的...</div></div></div></a><a class="pagination-related" href="/2026/07/28/cpp/%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E6%A8%A1%E7%89%88-md/" title="可变长参数模版"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-28</div><div class="info-item-2">可变长参数模版</div></div><div class="info-2"><div class="info-item-1">需要预先学习：  模版基础   可变长参数模版 普通模版的参数数量是固定的——template &lt;typename T1, typename T2&gt; 只能接受两个类型。而可变长参数模版（variadic template）打破了这一限制：可以写出接受任意数量、任意类型参数的模版。 这是 C++11 引入的特性，std::tuple、std::make_shared、std::thread 的构造函数等大量标准库组件都是基于它实现的。  基础语法 可变长参数模版的核心是参数包（parameter pack）。用 typename... Args 声明一个类型参数包，用 Args... args 声明一个函数参数包： template &lt;typename... Args> void print(Args... args) &#123;     // args 是一个参数包，包含调用时传入的全部实参 &#125; Args 是一个类型参数包（type parameter pack），代表零个或多个类型；args 是一个函数参数包（function parame...</div></div></div></a><a class="pagination-related" href="/2026/07/22/cpp/%E6%A0%87%E8%AF%86%E7%AC%A6/" title="标识符"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">标识符</div></div><div class="info-2"><div class="info-item-1"> 标识符 标识符（identifier）：在程序中用来充当变量、函数、类等的名字。  标识符的命名规则 1.标识符只能由字母、数字和下划线组成，并且必须以字母或下划线开头。 int myVariable = 10;        // 正确，myVariable 以字母开头 int _myVariable = 20;       // 正确，_myVariable 以下划线开头 int myVariable2 = 40;       // 正确，可以包含数字 int 2myVariable = 30;       // 错误，可以包含数字但不能以数字开头 int my-Variable = 40;       // 错误，标识符中不能包含其它字符 2.标识符不能是 C++ 的关键字。 这里 C++ 的关键字不需要特殊记忆，因为在编程过程中会经常接触到它们，自然而然就会记住它们了。 int int = 10;              // 错误，int 是 C++ 的关键字 int while = 20;            // 错误，while 是 C++ 的关键字 int...</div></div></div></a><a class="pagination-related" href="/2026/07/24/cpp/%E8%81%94%E5%90%88%E4%B8%8Estd-variant/" title="联合与std::variant"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-24</div><div class="info-item-2">联合与std::variant</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  内存基础 变量与常量   联合（Union） 联合（union） 是一种特殊的数据类型，它允许在同一块内存空间中存储不同类型的数据，但同一时刻只能有一个成员是有效的。定义语法与 struct 类似，只是把关键字换为 union： union Data &#123;     int    i;     double d;     char   c; &#125;; 使用时像结构体一样访问成员，但所有成员共享同一块内存： #include &lt;iostream>  int main() &#123;     Data u;     u.i = 42;                       // 写入 int     std::cout &lt;&lt; u.i &lt;&lt; std::endl;  // 输出: 42      u.d = 3.14;                     // 写入 double——覆盖了原来的 int     std::cout &lt;&lt; u.d &lt;&lt; std::endl;  /...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">颐大人</div><div class="author-info-description">叽里咕噜说什么呢，vivo50</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">25</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/286373468"><i class="fab fa-bilibili"></i><span>B站主页</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">switch-case 语句</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#break-%E7%9A%84%E7%94%A8%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">break 的用法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8-case-%E4%B8%AD%E5%AE%9A%E4%B9%89%E5%8F%98%E9%87%8F"><span class="toc-number">1.2.</span> <span class="toc-text">在 case 中定义变量</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">switch-case 与 if-else 的比较</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E9%99%90%E5%88%B6"><span class="toc-number">2.1.</span> <span class="toc-text">条件限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%88%E7%8E%87%E5%B1%82%E9%9D%A2"><span class="toc-number">2.2.</span> <span class="toc-text">效率层面</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/08/17/cpp/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F/" title="Lambda表达式"><img src="/img/cpp.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Lambda表达式"/></a><div class="content"><a class="title" href="/2026/08/17/cpp/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F/" title="Lambda表达式">Lambda表达式</a><time datetime="2026-08-17T11:26:18.000Z" title="发表于 2026-08-17 19:26:18">2026-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/31/opengl/%E9%A1%B6%E7%82%B9%E4%B8%8E%E7%9D%80%E8%89%B2%E5%99%A8%E7%9A%84%E5%B0%81%E8%A3%85/" title="顶点与着色器的封装"><img src="/img/opengl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="顶点与着色器的封装"/></a><div class="content"><a class="title" href="/2026/07/31/opengl/%E9%A1%B6%E7%82%B9%E4%B8%8E%E7%9D%80%E8%89%B2%E5%99%A8%E7%9A%84%E5%B0%81%E8%A3%85/" title="顶点与着色器的封装">顶点与着色器的封装</a><time datetime="2026-07-31T10:32:33.000Z" title="发表于 2026-07-31 18:32:33">2026-07-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/30/opengl/%E7%9D%80%E8%89%B2%E5%99%A8/" title="opengl/着色器"><img src="/img/opengl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="opengl/着色器"/></a><div class="content"><a class="title" href="/2026/07/30/opengl/%E7%9D%80%E8%89%B2%E5%99%A8/" title="opengl/着色器">opengl/着色器</a><time datetime="2026-07-30T09:55:33.000Z" title="发表于 2026-07-30 17:55:33">2026-07-30</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By 颐大人</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.2</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.6.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.6.0"></script><script src="/js/main.js?v=5.6.0"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script src="/js/code-font-size.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
