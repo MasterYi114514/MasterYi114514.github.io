@@ -1,0 +1,452 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>继承 | CS学习从入门到入土</title><meta name="author" content="颐大人"><meta name="copyright" content="颐大人"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="需要预先学习：  [[类与对象]] [[封装]]   继承 继承（inheritance）让一个新类可以获得另一个类的成员，从而复用代码，并表达&quot;是一种&quot;（is-a）的关系。 学生、教师都是人，都有姓名、年龄，都会打招呼。把这些共性提取到 Person 类里，让 Student、Teacher 从它继承，各自只需写独有的部分——不必把姓名、年龄在每个类里重复一遍。  基类（ba">
+<meta property="og:type" content="article">
+<meta property="og:title" content="继承">
+<meta property="og:url" content="https://masteryi114514.github.io/2026/08/17/cpp/%E7%BB%A7%E6%89%BF/index.html">
+<meta property="og:site_name" content="CS学习从入门到入土">
+<meta property="og:description" content="需要预先学习：  [[类与对象]] [[封装]]   继承 继承（inheritance）让一个新类可以获得另一个类的成员，从而复用代码，并表达&quot;是一种&quot;（is-a）的关系。 学生、教师都是人，都有姓名、年龄，都会打招呼。把这些共性提取到 Person 类里，让 Student、Teacher 从它继承，各自只需写独有的部分——不必把姓名、年龄在每个类里重复一遍。  基类（ba">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://masteryi114514.github.io/img/cpp.jpg">
+<meta property="article:published_time" content="2026-08-17T15:35:20.000Z">
+<meta property="article:modified_time" content="2026-08-17T13:05:26.275Z">
+<meta property="article:author" content="颐大人">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://masteryi114514.github.io/img/cpp.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "继承",
+  "url": "https://masteryi114514.github.io/2026/08/17/cpp/%E7%BB%A7%E6%89%BF/",
+  "image": "https://masteryi114514.github.io/img/cpp.jpg",
+  "datePublished": "2026-08-17T15:35:20.000Z",
+  "dateModified": "2026-08-17T13:05:26.275Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "颐大人",
+      "url": "https://MasterYi114514.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.jpg"><link rel="canonical" href="https://masteryi114514.github.io/2026/08/17/cpp/%E7%BB%A7%E6%89%BF/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.6.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '7F7F7F')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '继承',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><link rel="stylesheet" href="/self/fonts.css"><link rel="stylesheet" href="/self/atom-one-dark.css"><meta name="generator" content="Hexo 8.1.2"></head><body><div class="bg-animation" id="web_bg" style="background-color: #27282A;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">29</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-folder"></i><span> 所有分类</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/Cpp/"><i class="fa-fw fas fa-code"></i><span> C++教程</span></a></li><li><a class="site-page child" href="/categories/CMake/"><i class="fa-fw fas fa-cogs"></i><span> CMake教程</span></a></li><li><a class="site-page child" href="/categories/OpenGL/"><i class="fa-fw fas fa-cube"></i><span> OpenGL学习记录</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/cpp.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"></a><a class="nav-page-title" href="/"><span class="site-name">继承</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-folder"></i><span> 所有分类</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/Cpp/"><i class="fa-fw fas fa-code"></i><span> C++教程</span></a></li><li><a class="site-page child" href="/categories/CMake/"><i class="fa-fw fas fa-cogs"></i><span> CMake教程</span></a></li><li><a class="site-page child" href="/categories/OpenGL/"><i class="fa-fw fas fa-cube"></i><span> OpenGL学习记录</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">继承</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-08-17T15:35:20.000Z" title="发表于 2026-08-17 23:35:20">2026-08-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-08-17T13:05:26.275Z" title="更新于 2026-08-17 21:05:26">2026-08-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Cpp/">Cpp</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>需要预先学习：</p>
+<ul>
+<li><a href="/2026/08/17/cpp/类与对象/">类与对象</a></li>
+<li><a href="/2026/08/17/cpp/封装/">封装</a></li>
+</ul>
+<hr>
+<h1>1. 继承</h1>
+<p><strong>继承</strong>（inheritance）让一个新类可以<strong>获得</strong>另一个类的成员，从而复用代码，并表达&quot;是一种&quot;（is-a）的关系。</p>
+<p>学生、教师都是人，都有姓名、年龄，都会打招呼。把这些共性提取到 <code>Person</code> 类里，让 <code>Student</code>、<code>Teacher</code> 从它继承，各自只需写独有的部分——不必把姓名、年龄在每个类里重复一遍。</p>
+<ul>
+<li><strong>基类</strong>（base class，也叫父类）：被继承的类</li>
+<li><strong>派生类</strong>（derived class，也叫子类）：继承别人的类</li>
+</ul>
+<p>“学生是一个人”——这种 is-a 关系是继承的核心：派生类对象可以当作基类对象来用。</p>
+<hr>
+<h2 id="继承的语法">1.1 继承的语法</h2>
+<p>继承写在类名后面的冒号处：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Student</span> <span class="token operator">:</span> <span class="token base-clause"><span class="token keyword">public</span> <span class="token class-name">Person</span>      <span class="token comment">// Student 公开继承 Person</span></span>
+<span class="token punctuation">&#123;</span>
+    <span class="token comment">// 这里只需写 Student 独有的成员</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+
+<span class="token keyword">class</span> <span class="token class-name">Person</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">string</span> m_name<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> m_age <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">void</span> <span class="token function">say_hello</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"你好，我是"</span> <span class="token operator">&lt;&lt;</span> m_name <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Student</span> <span class="token operator">:</span> <span class="token base-clause"><span class="token keyword">public</span> <span class="token class-name">Person</span></span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">string</span> m_school<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    Student s<span class="token punctuation">;</span>
+    s<span class="token punctuation">.</span>m_name <span class="token operator">=</span> <span class="token string">"张三"</span><span class="token punctuation">;</span>               <span class="token comment">// 继承自 Person 的成员变量</span>
+    s<span class="token punctuation">.</span>m_age <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+    s<span class="token punctuation">.</span>m_school <span class="token operator">=</span> <span class="token string">"第一中学"</span><span class="token punctuation">;</span>          <span class="token comment">// Student 自己的成员变量</span>
+    s<span class="token punctuation">.</span><span class="token function">say_hello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                   <span class="token comment">// 继承自 Person 的成员函数</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"就读于"</span> <span class="token operator">&lt;&lt;</span> s<span class="token punctuation">.</span>m_school <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>编译并运行代码后，看到这样的输出：</p>
+<pre class="line-numbers language-none"><code class="language-none">你好，我是张三
+就读于第一中学<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><code>Student</code> 的对象同时拥有 <code>Person</code> 的成员和 <code>Student</code> 自己的成员，可以直接使用继承来的成员，就像它们本来就属于 <code>Student</code> 一样。</p>
+<hr>
+<h2 id="继承方式与访问权限">1.2 继承方式与访问权限</h2>
+<p>继承时同样要写一个访问权限限定符，它决定<strong>基类成员在派生类中</strong>的访问权限：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">基类成员</th>
+<th style="text-align:center"><code>public</code> 继承</th>
+<th style="text-align:center"><code>protected</code> 继承</th>
+<th style="text-align:center"><code>private</code> 继承</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>public</code></td>
+<td style="text-align:center">仍是 <code>public</code></td>
+<td style="text-align:center">变为 <code>protected</code></td>
+<td style="text-align:center">变为 <code>private</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>protected</code></td>
+<td style="text-align:center">仍是 <code>protected</code></td>
+<td style="text-align:center">仍是 <code>protected</code></td>
+<td style="text-align:center">变为 <code>private</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>private</code></td>
+<td style="text-align:center">不可直接访问</td>
+<td style="text-align:center">不可直接访问</td>
+<td style="text-align:center">不可直接访问</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>无论哪种继承方式，基类的 <code>private</code> 成员在派生类中都<strong>不可直接访问</strong>——但它们仍然存在于派生类对象里，只是必须通过基类的公开接口间接使用</li>
+<li><code>public</code> 继承最常用，也最符合 is-a 的语义；<code>protected</code>、<code>private</code> 继承较少使用，本章只以 <code>public</code> 继承为主</li>
+</ul>
+<p><strong><code>protected</code> 与 <code>private</code> 的区别</strong></p>
+<p>在 <a href="/2026/08/17/cpp/封装/">封装</a> 里两者看起来一样（类外部都不可访问），差别在于派生类：</p>
+<ul>
+<li><code>private</code>：只有<strong>本类</strong>的成员函数能访问</li>
+<li><code>protected</code>：本类和<strong>派生类</strong>的成员函数都能访问</li>
+</ul>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+
+<span class="token keyword">class</span> <span class="token class-name">Animal</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"吃东西"</span> <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+
+<span class="token keyword">protected</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">string</span> m_kind <span class="token operator">=</span> <span class="token string">"动物"</span><span class="token punctuation">;</span>     <span class="token comment">// 派生类可以访问</span>
+
+<span class="token keyword">private</span><span class="token operator">:</span>
+    <span class="token keyword">int</span> m_weight <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>               <span class="token comment">// 派生类也不可访问</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Dog</span> <span class="token operator">:</span> <span class="token base-clause"><span class="token keyword">public</span> <span class="token class-name">Animal</span></span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token keyword">void</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"我是一只"</span> <span class="token operator">&lt;&lt;</span> m_kind <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>     <span class="token comment">// protected 成员，派生类可以访问</span>
+        <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> m_weight <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>                <span class="token comment">// 错误！private 成员，派生类不可访问</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    Dog d<span class="token punctuation">;</span>
+    d<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>编译时报错：</p>
+<pre class="line-numbers language-none"><code class="language-none">error: &#39;int Animal::m_weight&#39; is private within this context<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>所以设计基类时，把&quot;希望派生类直接使用、但不希望外界碰&quot;的成员声明为 <code>protected</code>；只希望本类自己使用的成员声明为 <code>private</code>。</p>
+<hr>
+<h2 id="继承中的构造函数与析构函数">1.3 继承中的构造函数与析构函数</h2>
+<p>派生类对象在创建时，会先构造其中的基类部分，再构造派生类自己的部分——就像盖楼先打地基、再建上层。销毁时的顺序正好相反。</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+
+<span class="token keyword">class</span> <span class="token class-name">Person</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token function">Person</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">string</span><span class="token operator">&amp;</span> name<span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">m_name</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"Person 构造: "</span> <span class="token operator">&lt;&lt;</span> m_name <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token operator">~</span><span class="token function">Person</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"Person 析构: "</span> <span class="token operator">&lt;&lt;</span> m_name <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+<span class="token keyword">private</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">string</span> m_name<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Student</span> <span class="token operator">:</span> <span class="token base-clause"><span class="token keyword">public</span> <span class="token class-name">Person</span></span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token function">Student</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">string</span><span class="token operator">&amp;</span> name<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">string</span><span class="token operator">&amp;</span> school<span class="token punctuation">)</span>
+        <span class="token operator">:</span> <span class="token function">Person</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">m_school</span><span class="token punctuation">(</span>school<span class="token punctuation">)</span>         <span class="token comment">// 在初始化列表中调用基类构造函数</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"Student 构造: "</span> <span class="token operator">&lt;&lt;</span> m_school <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token operator">~</span><span class="token function">Student</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"Student 析构: "</span> <span class="token operator">&lt;&lt;</span> m_school <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+<span class="token keyword">private</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">string</span> m_school<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    Student <span class="token function">s</span><span class="token punctuation">(</span><span class="token string">"张三"</span><span class="token punctuation">,</span> <span class="token string">"第一中学"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>编译并运行代码后，看到这样的输出：</p>
+<pre class="line-numbers language-none"><code class="language-none">Person 构造: 张三
+Student 构造: 第一中学
+Student 析构: 第一中学
+Person 析构: 张三<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>规则：</p>
+<ol>
+<li>创建：先基类构造函数，后派生类构造函数；销毁：先派生类析构函数，后基类析构函数</li>
+<li>派生类构造函数可以在<strong>初始化列表</strong>中调用基类构造函数，把参数传过去</li>
+<li>如果基类没有默认构造函数，派生类构造函数必须显式调用基类的某个构造函数，否则编译报错</li>
+<li>派生类不继承基类的构造函数；如果不显式写，编译器会自动生成一个默认构造函数，它先调用基类的默认构造函数</li>
+</ol>
+<hr>
+<h2 id="名字隐藏">1.4 名字隐藏</h2>
+<p>如果派生类定义了与基类同名的函数，基类的<strong>所有</strong>同名重载都会被隐藏（name hiding）——即使参数列表不同：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+
+<span class="token keyword">class</span> <span class="token class-name">Base</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token keyword">void</span> <span class="token function">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"Base::func()"</span> <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+    <span class="token keyword">void</span> <span class="token function">func</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"Base::func(int)"</span> <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Derived</span> <span class="token operator">:</span> <span class="token base-clause"><span class="token keyword">public</span> <span class="token class-name">Base</span></span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token keyword">void</span> <span class="token function">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"Derived::func()"</span> <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    Derived d<span class="token punctuation">;</span>
+    d<span class="token punctuation">.</span><span class="token function">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    d<span class="token punctuation">.</span><span class="token function">func</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>           <span class="token comment">// 错误！Base 的 func(int) 被隐藏了</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>编译时报错：</p>
+<pre class="line-numbers language-none"><code class="language-none">error: no matching function for call to &#39;Derived::func(int)&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>编译器在派生类里找到 <code>func</code> 这个名字后就不再向上查找，于是基类的重载统统看不见了。有两种解决办法：</p>
+<ul>
+<li>用类名限定调用：<code>d.Base::func(1);</code></li>
+<li>在派生类里用 <code>using Base::func;</code> 把基类的所有同名重载都引入进来</li>
+</ul>
+<hr>
+<h2 id="派生类对象的内存布局">1.5 派生类对象的内存布局</h2>
+<p>派生类对象在内存中，先存放基类部分（<strong>基类子对象</strong>），再存放派生类新增的成员：</p>
+<pre class="line-numbers language-none"><code class="language-none">Student 对象的内存布局
++------------------------+
+|  Person 部分            |  基类子对象：m_name、m_age
++------------------------+
+|  m_school              |  Student 新增成员
++------------------------+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>把派生类对象的地址赋给基类指针时，指针指向的正是最前面这段基类子对象。这个布局在 <a href="/2026/08/17/cpp/多态/">多态</a> 里讨论虚函数表时还会用到。</p>
+<hr>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/C/">C++</a></div></div><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/07/22/cpp/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E4%B8%8ERAII/" title="智能指针与RAII"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">智能指针与RAII</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  指针   原始指针的缺点 原始指针/裸指针：如int* p，需要手动管理内存，容易造成以下问题： 1. 忘记delete/free会导致内存泄露: // 局部变量 ptr 指向的堆内存未释放，造成内存泄露 void func &#123;     Type* ptr = new Type();     ptr->do_something(); &#125; 2.使用释放后的悬挂指针，导致未定义行为： Type* ptr = new Type(); delete ptr; ptr->do_something(); 3. 重复释放同一块内存，导致未定义行为或程序崩溃 Type* ptr = new Type(); delete ptr; delete ptr;       // 重复释放同一块内存  RAII（Resource Acquisition Is Initialization） RAII（直译为“资源获取即初始化”）：在 对象构造阶段获取资源，在 对象析构阶段释放资源；依靠 C++ 对象自动生命周期管理（离开作用域自动调用析构），保证资源一定会被释...</div></div></div></a><a class="pagination-related" href="/2026/08/17/cpp/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F/" title="Lambda表达式"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-17</div><div class="info-item-2">Lambda表达式</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  函数   lambda 表达式 通过使用lambda表达式可以在代码中就地定义短小的函数逻辑，同时能捕获外层作用域的变量作为内部状态，其核心语法如下： [捕获列表](参数列表) &#123;     函数体 &#125; 例如： []() &#123; std::cout &lt;&lt; "this is lambda!" &lt;&lt; std::endl; &#125; 1. 无参数时，括号可以省略 [] &#123; std::cout &lt;&lt; "this is lambda!" &lt;&lt; std::endl; &#125; 2. 可以在函数体后紧跟一个括号，表示直接调用该匿名函数 [] &#123; std::cout &lt;&lt; "this is lambda!" &lt;&lt; std::endl; &#125;();  lambda 表达式的捕获方式 值捕获 值捕获：捕获变量的副本，在lambda定义时完成拷贝。  显式捕获：写法为[变量名1, 变量名2, ...]，用于显式捕获外界的变量 隐式捕获：写法为[=...</div></div></div></a><a class="pagination-related" href="/2026/07/27/cpp/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%B8%8E%E5%9F%BA%E7%A1%80%E8%AF%AD%E5%8F%A5/" title="表达式与基础语句"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-27</div><div class="info-item-2">表达式与基础语句</div></div><div class="info-2"><div class="info-item-1">需要预先学习：  变量与常量   基础表达式 表达式是由运算符和操作数组成的计算单元。最简单的表达式可以是一个变量或一个字面量（如 a、10），复杂的表达式则通过运算符将多个操作数组合起来（如 a + b * 2）。每个表达式在求值后都会产生一个结果值。 在 C++ 中，只要是能产生值的代码片段，都可以看作表达式。  算数表达式 算术表达式使用算术运算符对数值类型（如 int、float、double）的操作数进行计算。C++ 提供五种基本算术运算符：    运算符 含义 示例     + 加法 a + b   - 减法 a - b   * 乘法 a * b   / 除法 a / b   % 取模（取余） a % b    int a = 10; int b = 3;  int sum  = a + b;    // 13 int diff = a - b;    // 7 int prod = a * b;    // 30 int quot = a / b;    // 3 int rem  = a % b;    // 1 溢出的问题 +、-、* 运算可能导致溢出—...</div></div></div></a><a class="pagination-related" href="/2026/07/22/cpp/%E6%95%B0%E7%BB%84%E5%90%8D%E9%80%80%E5%8C%96%E4%B8%BA%E6%8C%87%E9%92%88/" title="数组名退化为指针"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">数组名退化为指针</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  数组 指针   数组到指针的退化 数组名出现在大多数表达式中，会被编译器自动转化为指向数组首元素的指针： int arr[5] = &#123; 1, 2, 3, 4, 5 &#125;; int* p = arr;        // arr 这里的含义为 &amp;arr[0]，类型为 int* 1. 下标访问arr[i]在底层等价于*(arr + i) 甚至可以可以有3[arr]这样的写法，和arr[3]等效： #include &lt;iostream>  int main() &#123;     int arr[5] = &#123; 1, 2, 3, 4, 5 &#125;;     std::cout &lt;&lt; 3[arr] &lt;&lt; std::endl;   // 并不建议的写法      return 0; &#125; 2. 可以用指针的方式访问数组，或用数组的方式访问指针 #include &lt;iostream>    int main() &#123;     int arr[5] = &#123; ...</div></div></div></a><a class="pagination-related" href="/2026/07/21/cpp/%E6%8C%87%E9%92%88/" title="指针"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-21</div><div class="info-item-2">指针</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  内存基础   &amp;取地址符 &amp; 是取地址符，用于获取变量的内存地址。大多数的数据类型往往占用不止一个字节的空间， &amp; 取到的就是其中第一个字节的地址。 #include &lt;iostream>  int main() &#123;     int a = 10;         // 创建一个 int 类型的变量 a     std::cout &lt;&lt; "a 的地址: " &lt;&lt; &amp;a &lt;&lt; std::endl;     std::cout &lt;&lt; "地址的大小： " &lt;&lt; sizeof(&amp;a) &lt;&lt; " 个字节" &lt;&lt; std::endl;      return 0; &#125; 编译并运行代码后，看到这样的输出： a 的地址: 0x378cfffe2c 地址的大小： 8 个字节  地址大小与 CPU 架构的关联  对于x86_32架构的CPU，其地址总线为32位，对应地址的大小是32个二进制位，也就是4个字节。 对于x86_64...</div></div></div></a><a class="pagination-related" href="/2026/07/22/cpp/%E5%BC%95%E7%94%A8%E4%B8%8E%E5%B7%A6%E5%8F%B3%E5%80%BC/" title="引用与左右值"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">引用与左右值</div></div><div class="info-2"><div class="info-item-1"> 引用 引用（Reference） 是一个已存在变量的别名，它提供了一种更方便的方式来间接访问变量，语法为类型 &amp;别名 = 变量名;: int num = 10; int&amp; ref = num;    // ref 是变量 num 的别名  引用的注意事项 1. 引用必须在定义的时候初始化。 int&amp; ref;               // 错误操作 2. 引用不能再绑定其它变量。 int num1 = 10, num2 = 20; int&amp; ref = num1;  ref = num2;    // 这个操作是把 num2 的值赋给 num1，而不是让ref成为num2的引用  常引用 常引用（Const Reference） 是指向常量的引用，使用const关键字修饰，语法为const 类型 &amp;常引用名 = 变量名/常量名。 int num = 10; const int&amp; const_ref = num;  即使常引用指向的是变量，也不允许通过引用对其进行修改。  左值与右值  左值 左值（lvalue）：具有持久内存地...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">颐大人</div><div class="author-info-description">叽里咕噜说什么呢，vivo50</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">29</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/286373468"><i class="fab fa-bilibili"></i><span>B站主页</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">继承</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%A7%E6%89%BF%E7%9A%84%E8%AF%AD%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">继承的语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%A7%E6%89%BF%E6%96%B9%E5%BC%8F%E4%B8%8E%E8%AE%BF%E9%97%AE%E6%9D%83%E9%99%90"><span class="toc-number">1.2.</span> <span class="toc-text">继承方式与访问权限</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%A7%E6%89%BF%E4%B8%AD%E7%9A%84%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E4%B8%8E%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0"><span class="toc-number">1.3.</span> <span class="toc-text">继承中的构造函数与析构函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8D%E5%AD%97%E9%9A%90%E8%97%8F"><span class="toc-number">1.4.</span> <span class="toc-text">名字隐藏</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%BE%E7%94%9F%E7%B1%BB%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80"><span class="toc-number">1.5.</span> <span class="toc-text">派生类对象的内存布局</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/08/17/cpp/%E5%A4%9A%E6%80%81/" title="多态"><img src="/img/cpp.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="多态"/></a><div class="content"><a class="title" href="/2026/08/17/cpp/%E5%A4%9A%E6%80%81/" title="多态">多态</a><time datetime="2026-08-17T15:35:42.000Z" title="发表于 2026-08-17 23:35:42">2026-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/17/cpp/%E7%BB%A7%E6%89%BF/" title="继承"><img src="/img/cpp.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="继承"/></a><div class="content"><a class="title" href="/2026/08/17/cpp/%E7%BB%A7%E6%89%BF/" title="继承">继承</a><time datetime="2026-08-17T15:35:20.000Z" title="发表于 2026-08-17 23:35:20">2026-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/17/cpp/%E5%B0%81%E8%A3%85/" title="封装"><img src="/img/cpp.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="封装"/></a><div class="content"><a class="title" href="/2026/08/17/cpp/%E5%B0%81%E8%A3%85/" title="封装">封装</a><time datetime="2026-08-17T15:33:33.000Z" title="发表于 2026-08-17 23:33:33">2026-08-17</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By 颐大人</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.2</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.6.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.6.0"></script><script src="/js/main.js?v=5.6.0"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script src="/js/code-font-size.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

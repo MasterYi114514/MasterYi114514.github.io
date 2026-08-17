@@ -1,0 +1,396 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>封装 | CS学习从入门到入土</title><meta name="author" content="颐大人"><meta name="copyright" content="颐大人"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="需要预先学习：  [[类与对象]]   封装 封装（encapsulation）有两层含义：  把数据（成员变量）和操作数据的行为（成员函数）打包到类中 通过访问权限限定符控制谁能访问这些成员，把实现细节藏起来  在 [[类与对象]] 里，成员统一用了 public，任何代码都能直接读写成员变量。这带来一个问题：如果有人给 m_age 赋了 -1，程序照单全收，对象就处于“年龄是负数”的非法状态。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="封装">
+<meta property="og:url" content="https://masteryi114514.github.io/2026/08/17/cpp/%E5%B0%81%E8%A3%85/index.html">
+<meta property="og:site_name" content="CS学习从入门到入土">
+<meta property="og:description" content="需要预先学习：  [[类与对象]]   封装 封装（encapsulation）有两层含义：  把数据（成员变量）和操作数据的行为（成员函数）打包到类中 通过访问权限限定符控制谁能访问这些成员，把实现细节藏起来  在 [[类与对象]] 里，成员统一用了 public，任何代码都能直接读写成员变量。这带来一个问题：如果有人给 m_age 赋了 -1，程序照单全收，对象就处于“年龄是负数”的非法状态。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://masteryi114514.github.io/img/cpp.jpg">
+<meta property="article:published_time" content="2026-08-17T15:33:33.000Z">
+<meta property="article:modified_time" content="2026-08-17T17:16:17.669Z">
+<meta property="article:author" content="颐大人">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://masteryi114514.github.io/img/cpp.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "封装",
+  "url": "https://masteryi114514.github.io/2026/08/17/cpp/%E5%B0%81%E8%A3%85/",
+  "image": "https://masteryi114514.github.io/img/cpp.jpg",
+  "datePublished": "2026-08-17T15:33:33.000Z",
+  "dateModified": "2026-08-17T17:16:17.669Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "颐大人",
+      "url": "https://MasterYi114514.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.jpg"><link rel="canonical" href="https://masteryi114514.github.io/2026/08/17/cpp/%E5%B0%81%E8%A3%85/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.6.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '7F7F7F')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '封装',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><link rel="stylesheet" href="/self/fonts.css"><link rel="stylesheet" href="/self/atom-one-dark.css"><meta name="generator" content="Hexo 8.1.2"></head><body><div class="bg-animation" id="web_bg" style="background-color: #27282A;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">29</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-folder"></i><span> 所有分类</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/Cpp/"><i class="fa-fw fas fa-code"></i><span> C++教程</span></a></li><li><a class="site-page child" href="/categories/CMake/"><i class="fa-fw fas fa-cogs"></i><span> CMake教程</span></a></li><li><a class="site-page child" href="/categories/OpenGL/"><i class="fa-fw fas fa-cube"></i><span> OpenGL学习记录</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/cpp.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"></a><a class="nav-page-title" href="/"><span class="site-name">封装</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-folder"></i><span> 所有分类</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/Cpp/"><i class="fa-fw fas fa-code"></i><span> C++教程</span></a></li><li><a class="site-page child" href="/categories/CMake/"><i class="fa-fw fas fa-cogs"></i><span> CMake教程</span></a></li><li><a class="site-page child" href="/categories/OpenGL/"><i class="fa-fw fas fa-cube"></i><span> OpenGL学习记录</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">封装</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-08-17T15:33:33.000Z" title="发表于 2026-08-17 23:33:33">2026-08-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-08-17T17:16:17.669Z" title="更新于 2026-08-18 01:16:17">2026-08-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Cpp/">Cpp</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>需要预先学习：</p>
+<ul>
+<li><a href="/2026/08/17/cpp/类与对象/">类与对象</a></li>
+</ul>
+<hr>
+<h1>1. 封装</h1>
+<p><strong>封装</strong>（encapsulation）有两层含义：</p>
+<ol>
+<li>把数据（成员变量）和操作数据的行为（成员函数）<strong>打包</strong>到类中</li>
+<li>通过<strong>访问权限限定符</strong>控制谁能访问这些成员，把实现细节藏起来</li>
+</ol>
+<p>在 <a href="/2026/08/17/cpp/类与对象/">类与对象</a> 里，成员统一用了 <code>public</code>，任何代码都能直接读写成员变量。这带来一个问题：如果有人给 <code>m_age</code> 赋了 <code>-1</code>，程序照单全收，对象就处于“年龄是负数”的非法状态。封装要做的,就是收起成员的直接访问权,只通过类提供的成员函数来操作数据,由类自己守住数据的合法性。</p>
+<hr>
+<h2 id="访问权限限定符">1.1 访问权限限定符</h2>
+<p>C++ 提供三种<strong>访问权限限定符</strong>，用它们把类体分成几个区域：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">限定符</th>
+<th style="text-align:center">类内部</th>
+<th style="text-align:center">类外部</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>public</code></td>
+<td style="text-align:center">可访问</td>
+<td style="text-align:center">可访问</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>private</code></td>
+<td style="text-align:center">可访问</td>
+<td style="text-align:center">不可访问</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>protected</code></td>
+<td style="text-align:center">可访问</td>
+<td style="text-align:center">不可访问</td>
+</tr>
+</tbody>
+</table>
+<p><code>private</code> 与 <code>protected</code> 在&quot;类外部不可访问&quot;上是一致的，区别在于<strong>继承</strong>时派生类能否访问（详见 <a href="/2026/08/17/cpp/继承/">继承</a>）。本节统一用 <code>private</code> 表示私有成员。</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+
+<span class="token keyword">class</span> <span class="token class-name">Person</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>                          <span class="token comment">// 公开接口</span>
+    <span class="token keyword">int</span> <span class="token function">get_age</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">const</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> m_age<span class="token punctuation">;</span>            <span class="token comment">// 成员函数可以访问私有成员</span>
+    <span class="token punctuation">&#125;</span>
+
+<span class="token keyword">private</span><span class="token operator">:</span>                         <span class="token comment">// 私有数据</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">string</span> m_name<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> m_age <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    Person zhangsan<span class="token punctuation">;</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> zhangsan<span class="token punctuation">.</span>m_age <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>   <span class="token comment">// 错误！类外不能访问私有成员</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>编译时报错：</p>
+<pre class="line-numbers language-none"><code class="language-none">error: &#39;int Person::m_age&#39; is private within this context<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>规则：</p>
+<ul>
+<li>成员函数无论写在类内的哪个区域，都可以访问类的所有成员</li>
+<li>类外部（如 <code>main</code> 中）只能访问 <code>public</code> 成员</li>
+<li><code>class</code> 的成员默认是 <code>private</code>，<code>struct</code> 的成员默认是 <code>public</code>（见下文&quot;struct 与 class&quot;）</li>
+</ul>
+<hr>
+<h2 id="通过公开接口操作私有数据">1.2 通过公开接口操作私有数据</h2>
+<p>私有成员变量不可直接访问，于是类对外提供一对公开的成员函数来读写它们：</p>
+<ul>
+<li><strong>getter</strong>：读取成员变量的值，通常形如 <code>get_age()</code>，声明为 <code>const</code></li>
+<li><strong>setter</strong>：修改成员变量的值，通常形如 <code>set_age()</code>，可以在其中<strong>校验</strong>新值的合法性</li>
+</ul>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string></span></span>
+
+<span class="token keyword">class</span> <span class="token class-name">Person</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token keyword">void</span> <span class="token function">set_age</span><span class="token punctuation">(</span><span class="token keyword">int</span> age<span class="token punctuation">)</span>        <span class="token comment">// setter：校验后才写入</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>age <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+            m_age <span class="token operator">=</span> age<span class="token punctuation">;</span>
+        <span class="token keyword">else</span>
+            <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> <span class="token string">"年龄不合法："</span> <span class="token operator">&lt;&lt;</span> age <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">int</span> <span class="token function">get_age</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">const</span>          <span class="token comment">// getter：只读</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> m_age<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+<span class="token keyword">private</span><span class="token operator">:</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">string</span> m_name<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> m_age <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    Person zhangsan<span class="token punctuation">;</span>
+    zhangsan<span class="token punctuation">.</span><span class="token function">set_age</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> zhangsan<span class="token punctuation">.</span><span class="token function">get_age</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>
+    zhangsan<span class="token punctuation">.</span><span class="token function">set_age</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">// 非法值被拦截</span>
+    <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">cout</span> <span class="token operator">&lt;&lt;</span> zhangsan<span class="token punctuation">.</span><span class="token function">get_age</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token builtin">std</span><span class="token double-colon punctuation">::</span><span class="token builtin">endl</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>编译并运行代码后，看到这样的输出：</p>
+<pre class="line-numbers language-none"><code class="language-none">20
+年龄不合法：-1
+20<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>可以看到，<code>-1</code> 被 setter 拦了下来，<code>m_age</code> 始终保持合法。如果不封装，<code>m_age</code> 被直接写成 <code>-1</code>，没人能拦住。</p>
+<hr>
+<h2 id="封装带来的好处">1.3 封装带来的好处</h2>
+<p><strong>1. 保证数据处于合法状态</strong></p>
+<p>数据只能通过 setter 写入，非法值在入口处被拦截，对象不会出现&quot;年龄为负&quot;这类状态。</p>
+<p><strong>2. 实现细节可以自由替换</strong></p>
+<p>使用者只依赖公开接口，不关心内部如何实现。只要接口不变，类的内部可以随意改造而不影响任何使用者：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Thermometer</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token keyword">double</span> <span class="token function">get_celsius</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">const</span> <span class="token punctuation">&#123;</span> <span class="token keyword">return</span> m_t<span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+
+<span class="token keyword">private</span><span class="token operator">:</span>
+    <span class="token keyword">double</span> m_t <span class="token operator">=</span> <span class="token number">0.0</span><span class="token punctuation">;</span>            <span class="token comment">// 内部存的是摄氏温度</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>如果某天想把内部存储换成开尔文温度，只需改动类内部的几行代码，<code>get_celsius()</code> 的调用方一行都不用动：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Thermometer</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token keyword">double</span> <span class="token function">get_celsius</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">const</span> <span class="token punctuation">&#123;</span> <span class="token keyword">return</span> m_t <span class="token operator">-</span> <span class="token number">273.15</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>   <span class="token comment">// 接口不变，内部换算</span>
+
+<span class="token keyword">private</span><span class="token operator">:</span>
+    <span class="token keyword">double</span> m_t <span class="token operator">=</span> <span class="token number">273.15</span><span class="token punctuation">;</span>         <span class="token comment">// 内部改存开尔文温度</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>3. 降低耦合</strong></p>
+<p>使用方的代码只和公开接口打交道，不会碰内部细节，类的改动不会波及使用方，程序的各个部分更容易独立修改和维护。</p>
+<hr>
+<h2 id="struct-与-class">1.4 struct 与 class</h2>
+<p>在 C++ 里，<code>struct</code> 和 <code>class</code> 几乎是同一个东西——<code>struct</code> 同样可以有成员函数、构造函数和继承。唯一的区别是<strong>默认访问权限</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">默认访问权限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>struct</code></td>
+<td style="text-align:center"><code>public</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>class</code></td>
+<td style="text-align:center"><code>private</code></td>
+</tr>
+</tbody>
+</table>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">struct</span> <span class="token class-name">Point</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span> m_x<span class="token punctuation">;</span>        <span class="token comment">// 默认 public，外部可直接访问</span>
+    <span class="token keyword">int</span> m_y<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Point2</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span> m_x<span class="token punctuation">;</span>        <span class="token comment">// 默认 private，外部不可访问</span>
+    <span class="token keyword">int</span> m_y<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>约定俗成的用法：<code>struct</code> 用于简单的数据打包（成员大多是公开的），<code>class</code> 用于需要封装的完整类型。</p>
+<hr>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/C/">C++</a></div></div><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/07/22/cpp/%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E7%9A%84%E5%80%BC%E4%BC%A0%E9%80%92%E4%B8%8E%E5%BC%95%E7%94%A8%E4%BC%A0%E9%80%92%E3%80%81%E6%8C%87%E9%92%88%E4%BC%A0%E9%80%92%E7%9A%84%E5%8C%BA%E5%88%AB/" title="函数参数的值传递与引用传递、指针传递的区别"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">函数参数的值传递与引用传递、指针传递的区别</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  函数 引用与左右值 指针   形参与实参 形式参数（Parameter） 形参是函数定义或函数声明时，在参数列表中声明的变量，是函数内部用来接收外部数据的占位符。  函数未被调用时，不占用实际内存 函数被调用时，创建并初始化 函数执行结束后立即销毁   实际参数（Argument） 实参是调用函数时传递给函数的具体数据。 // a、b是形参 int add(int a, int b) &#123;     return a + b; &#125;  int main() &#123;     int x = 10, y = 20;          // x+y、x*y是实参     int res = add(x + y, x * y);     return 0; &#125;  值传递 形参是实参的一份独立拷贝，形参与实参占有不同的内存地址。  函数内对形参的修改都不会作用于外部的实参 如果参数的内存占用过大，频繁地拷贝会导致明显的性能问题  void swap(int x, int y) &#123;     int temp =...</div></div></div></a><a class="pagination-related" href="/2026/07/26/cpp/%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89%E4%B8%8Estd-move/" title="移动语义与std::move"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-26</div><div class="info-item-2">移动语义与std::move</div></div><div class="info-2"><div class="info-item-1">需要预先学习：  引用与左右值   移动语义 移动语义（Move Semantics）是 C++11 引入的一项重要特性，它的核心思想是：当你把一个对象的资源&quot;转移&quot;到另一个对象时，不需要做深拷贝，而是直接把指针/句柄&quot;偷&quot;过来，让原对象变成一个空壳。这样可以避免大量不必要的拷贝开销，大幅提升性能。  拷贝的缺点 在传统 C++ 中，对象的传递依赖拷贝。对于管理堆内存的类（如 std::string、std::vector），拷贝意味着：  分配新的堆内存 逐字节复制原对象的数据 原对象和目标对象各自拥有独立的内存  #include &lt;cstring> #include &lt;iostream>  class MyString &#123; public:     MyString(const char* str)     &#123;         _size = std::strlen(str);         _data = new char[_size + 1];         std::strcpy(_da...</div></div></div></a><a class="pagination-related" href="/2026/07/21/cpp/%E5%86%85%E5%AD%98%E5%9F%BA%E7%A1%80/" title="内存基础"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-21</div><div class="info-item-2">内存基础</div></div><div class="info-2"><div class="info-item-1"> 进制 在基数为 R 的进制中,包含 R 个数字符号, 分别是 0, 1, 2, …, R-1 一个整数n位、小数m位的R进制数字，可以表示为： (N)R=(Kn−1Kn−2...K0.K−1K−2...K−m)R(N)_{R} = (K_{n-1} K_{n-2} ... K_0.K_{-1}K_{-2}...K_{-m})_{R} (N)R​=(Kn−1​Kn−2​...K0​.K−1​K−2​...K−m​)R​ 其中，KiK_iKi​ 是第 iii 位上的数字符号，满足 0≤Ki&lt;R0 \leq K_i &lt; R0≤Ki​&lt;R。 同时，也可以用连加符号来表示： (N)R=∑i=−mn−1KiRi(N)_{R} = \sum_{i=-m}^{n-1} K_i R^i (N)R​=i=−m∑n−1​Ki​Ri  二进制 二进制是基数为 2 的进制系统，使用两个数字符号：0 和 1。每一位上的权重是 2 的幂次方。 如： (1101)2=1∗23+1∗22+0∗21+1∗20=8+4+0+1=(13)10(1101)_2 = 1 * 2^3 + 1 * 2^2 ...</div></div></div></a><a class="pagination-related" href="/2026/07/22/cpp/%E6%95%B0%E7%BB%84/" title="数组"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-22</div><div class="info-item-2">数组</div></div><div class="info-2"><div class="info-item-1">需要预先了解：  变量与常量   数组 数组（Array）：同一类型数据的连续内存集合。 数组中的所有元素的类型都相同，并且长度固定，C++中可以用[]运算符来定义数组： // 类型 数组名[数组长度] int arr[5];         // 长度为5的 int 类型的整数数组 char str[100];      // 长度为100的 char 类型变量的字符数组（字符串）  通过[]运算符来访问数组元素 数组的下标索引从0开始： int main() &#123;     int arr[5];          arr[0] &#x3D; 10;     arr[4] &#x3D; 50;     arr[5] &#x3D; 100;    &#x2F;&#x2F; 错误，arr的下标范围是0~4，没有5 &#125;  常量数组 可以在定义数组的时候用const关键字来修饰数组元素，使得数组的每一个元素的值都不能被修改。 #include &lt;iostream>  int main() &#123;     const int arr[5] = &#1...</div></div></div></a><a class="pagination-related" href="/2026/07/27/cpp/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%B8%8E%E5%9F%BA%E7%A1%80%E8%AF%AD%E5%8F%A5/" title="表达式与基础语句"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-27</div><div class="info-item-2">表达式与基础语句</div></div><div class="info-2"><div class="info-item-1">需要预先学习：  变量与常量   基础表达式 表达式是由运算符和操作数组成的计算单元。最简单的表达式可以是一个变量或一个字面量（如 a、10），复杂的表达式则通过运算符将多个操作数组合起来（如 a + b * 2）。每个表达式在求值后都会产生一个结果值。 在 C++ 中，只要是能产生值的代码片段，都可以看作表达式。  算数表达式 算术表达式使用算术运算符对数值类型（如 int、float、double）的操作数进行计算。C++ 提供五种基本算术运算符：    运算符 含义 示例     + 加法 a + b   - 减法 a - b   * 乘法 a * b   / 除法 a / b   % 取模（取余） a % b    int a = 10; int b = 3;  int sum  = a + b;    // 13 int diff = a - b;    // 7 int prod = a * b;    // 30 int quot = a / b;    // 3 int rem  = a % b;    // 1 溢出的问题 +、-、* 运算可能导致溢出—...</div></div></div></a><a class="pagination-related" href="/2026/07/28/cpp/%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E6%A8%A1%E7%89%88-md/" title="可变长参数模版"><img class="cover" src="/img/cpp.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-28</div><div class="info-item-2">可变长参数模版</div></div><div class="info-2"><div class="info-item-1">需要预先学习：  模版基础   可变长参数模版 普通模版的参数数量是固定的——template &lt;typename T1, typename T2&gt; 只能接受两个类型。而可变长参数模版（variadic template）打破了这一限制：可以写出接受任意数量、任意类型参数的模版。 这是 C++11 引入的特性，std::tuple、std::make_shared、std::thread 的构造函数等大量标准库组件都是基于它实现的。  基础语法 可变长参数模版的核心是参数包（parameter pack）。用 typename... Args 声明一个类型参数包，用 Args... args 声明一个函数参数包： template &lt;typename... Args> void print(Args... args) &#123;     // args 是一个参数包，包含调用时传入的全部实参 &#125; Args 是一个类型参数包（type parameter pack），代表零个或多个类型；args 是一个函数参数包（function parame...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">颐大人</div><div class="author-info-description">叽里咕噜说什么呢，vivo50</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">29</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/286373468"><i class="fab fa-bilibili"></i><span>B站主页</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">封装</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BF%E9%97%AE%E6%9D%83%E9%99%90%E9%99%90%E5%AE%9A%E7%AC%A6"><span class="toc-number">1.1.</span> <span class="toc-text">访问权限限定符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E5%85%AC%E5%BC%80%E6%8E%A5%E5%8F%A3%E6%93%8D%E4%BD%9C%E7%A7%81%E6%9C%89%E6%95%B0%E6%8D%AE"><span class="toc-number">1.2.</span> <span class="toc-text">通过公开接口操作私有数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%81%E8%A3%85%E5%B8%A6%E6%9D%A5%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-number">1.3.</span> <span class="toc-text">封装带来的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#struct-%E4%B8%8E-class"><span class="toc-number">1.4.</span> <span class="toc-text">struct 与 class</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/08/17/cpp/%E5%A4%9A%E6%80%81/" title="多态"><img src="/img/cpp.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="多态"/></a><div class="content"><a class="title" href="/2026/08/17/cpp/%E5%A4%9A%E6%80%81/" title="多态">多态</a><time datetime="2026-08-17T15:35:42.000Z" title="发表于 2026-08-17 23:35:42">2026-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/17/cpp/%E7%BB%A7%E6%89%BF/" title="继承"><img src="/img/cpp.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="继承"/></a><div class="content"><a class="title" href="/2026/08/17/cpp/%E7%BB%A7%E6%89%BF/" title="继承">继承</a><time datetime="2026-08-17T15:35:20.000Z" title="发表于 2026-08-17 23:35:20">2026-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/17/cpp/%E5%B0%81%E8%A3%85/" title="封装"><img src="/img/cpp.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="封装"/></a><div class="content"><a class="title" href="/2026/08/17/cpp/%E5%B0%81%E8%A3%85/" title="封装">封装</a><time datetime="2026-08-17T15:33:33.000Z" title="发表于 2026-08-17 23:33:33">2026-08-17</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By 颐大人</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.2</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.6.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.6.0"></script><script src="/js/main.js?v=5.6.0"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script src="/js/code-font-size.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
